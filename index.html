@@ -204,6 +204,22 @@
       text-transform: uppercase; line-height: 0.95; letter-spacing: -0.03em; color: var(--white);
     }
 
+    /* ── CITAT ── */
+    /* Stand-alone "manifest"-udsagn mellem Metoden og Om mig — samme store,
+       fed typografiske vægt som hero-headline (se .hero-headline ovenfor),
+       men centreret og uden accent-eyebrow, så den læses som et selvstændigt
+       åndedrag frem for endnu en sektion-header. Sidste linje (payoff'et)
+       er i accent-gul, samme "ét ord/linje fremhævet"-princip som
+       hero-headline's .accent-word. */
+    .citat { padding: 140px 48px; text-align: center; }
+    .citat-inner { max-width: 780px; margin: 0 auto; }
+    .citat-text {
+      font-family: 'Inter', sans-serif; font-weight: 800;
+      font-size: clamp(24px, 3.4vw, 36px);
+      line-height: 1.4; letter-spacing: -0.01em; color: var(--white);
+    }
+    .citat-text .citat-payoff { color: var(--accent); display: inline-block; margin-top: 12px; }
+
     /* ── METODEN ── */
     .metode { padding: 120px 48px; }
     .metode-inner { max-width: 1100px; margin: 0 auto; }
@@ -551,6 +567,8 @@
       .metode-card { border-right: none; border-bottom: 1px solid #2a2a2a; }
       .metode-card:last-child { border-bottom: none; }
 
+      .citat { padding: 80px 24px; }
+
       .om-mig { padding: 80px 24px; }
       .om-mig-inner { grid-template-columns: 1fr; gap: 48px; }
       .om-mig-right { order: -1; }
@@ -647,6 +665,18 @@
     </div>
   </section>
 
+  <!-- CITAT -->
+  <section class="citat" id="citat">
+    <div class="citat-inner reveal">
+      <p class="citat-text">
+        Ingen — uanset hvor meget de har bildt sig selv det ind — er stået op en dag og ønsket sig smerter, livsstilssygdomme eller overvægt.
+        Ingen har drømt om det siden de var børn.
+        Alle benægter det, før de starter.
+        <span class="citat-payoff">Alle indrømmer bagefter, hvor lykkelige de er for at have taget skridtet.</span>
+      </p>
+    </div>
+  </section>
+
   <!-- OM MIG -->
   <section class="om-mig" id="om-mig">
     <div class="om-mig-inner reveal-stagger">
@@ -660,7 +690,7 @@
           <p>Det der ramte hårdest var noget andet: tanken om ikke at kunne løfte mine børn.</p>
           <p>Jeg valgte at kæmpe mig igennem det. Ikke hurtigt. Ikke perfekt. Men igennem.</p>
           <p>Den rejse lærte mig, at fremskridt ikke handler om aldrig at falde. Det handler om at rejse sig igen — og at have nogen der holder øje med, at du gør det.</p>
-          <p>I dag nærmer jeg mig igen 250 kg i dødløft. Jeg løber OCR. Jeg kan løfte mine børn.</p>
+          <p>I dag kan jeg dødløfte igen. Jeg løber OCR. Jeg kan løfte mine børn.</p>
           <p>Og jeg bruger alt det, jeg er — fejlene, kampene, vejen tilbage — i mit arbejde som coach.</p>
           <span class="om-mig-tagline">Ikke som facade. Som fundament.</span>
         </div>
