@@ -4,6 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RC Coaching</title>
+  <!-- RETTET (2026-09-02, publicerings-gennemgang): stod som "Åben opgave"
+       #7 i CHANGELOG.md — ingen meta description, ingen social-deling-
+       forhåndsvisning. og:image er bevidst udeladt (kræver et rigtigt
+       billede som en URL, ikke en data:-URI som resten af sidens billeder
+       — se "Åben opgave" #8 om at eksternalisere billeder). -->
+  <meta name="description" content="RC Coaching — personlig træningscoaching med Rune. Ingen skabeloner, ingen pakkeløsninger. Krop, sind og ansvarlighed i ét forløb, bygget til dig.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="RC Coaching">
+  <meta property="og:description" content="Personlig træningscoaching med Rune. Ingen skabeloner, ingen pakkeløsninger — krop, sind og ansvarlighed i ét forløb.">
+  <meta property="og:url" content="https://rccoaching.dk/">
+  <meta property="og:locale" content="da_DK">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="RC Coaching">
+  <meta name="twitter:description" content="Personlig træningscoaching med Rune. Ingen skabeloner, ingen pakkeløsninger.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230C0C0C'/%3E%3Ctext x='32' y='44' font-family='Arial, sans-serif' font-weight='900' font-size='30' fill='%23C4F501' text-anchor='middle'%3ERC%3C/text%3E%3C/svg%3E">
   <style>
     @font-face {
       font-family: 'Inter';
@@ -406,6 +421,11 @@
       background: var(--accent-hover);
       box-shadow: 0 12px 32px -12px rgba(196,245,1,0.5);
     }
+    .form-submit:disabled { opacity: 0.6; cursor: default; }
+    .kontakt-form-status {
+      margin-top: 20px; font-size: 14px; color: var(--accent);
+    }
+    .kontakt-form-status.error { color: var(--accent-red); }
 
     /* ── FOOTER ── */
     footer {
@@ -689,21 +709,38 @@
       </div>
 
       <div class="kontakt-right reveal">
-        <h3 id="kontakt-form-title">Skriv til mig</h3>
-        <p class="sub" id="kontakt-form-sub">Jeg svarer inden for 24 timer.</p>
-        <div class="form-group">
-          <label for="navn">Navn</label>
-          <input type="text" id="navn" name="navn" placeholder="Dit navn">
-        </div>
-        <div class="form-group">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="din@email.dk">
-        </div>
-        <div class="form-group">
-          <label for="besked">Besked</label>
-          <textarea id="besked" name="besked" placeholder="Fortæl lidt om dig selv og hvad du leder efter..."></textarea>
-        </div>
-        <button type="button" class="form-submit">Send besked</button>
+        <!-- RETTET (2026-09-02, publicerings-gennemgang): formularen havde
+             hverken en <form>-tag, en submit-handler eller nogen
+             afsendelses-mekanisme — "Send besked" var type="button" og
+             gjorde bogstaveligt talt ingenting.
+             Siden er 100% statisk (GitHub Pages, se CHANGELOG.md
+             "Domæneskift" + .github/workflows/deploy-pages.yml) — INGEN
+             server-side formular-behandling er mulig uden en ekstern
+             tjeneste (fx Formspree/Web3Forms), som kræver en konto Rune
+             selv skal oprette. Indtil videre bygger JS'en nedenfor i
+             stedet en mailto:-besked af felterne og åbner klientens eget
+             mail-program med den udfyldt, klar til afsendelse — ingen
+             ekstern konto nødvendigt, virker med det samme. Skriv til mig
+             hvis en "afsendes stille i baggrunden"-oplevelse ønskes i
+             stedet — det kræver en af de nævnte tjenester. -->
+        <form id="kontakt-form">
+          <h3 id="kontakt-form-title">Skriv til mig</h3>
+          <p class="sub" id="kontakt-form-sub">Jeg svarer inden for 24 timer.</p>
+          <div class="form-group">
+            <label for="navn">Navn</label>
+            <input type="text" id="navn" name="navn" placeholder="Dit navn" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="din@email.dk" required>
+          </div>
+          <div class="form-group">
+            <label for="besked">Besked</label>
+            <textarea id="besked" name="besked" placeholder="Fortæl lidt om dig selv og hvad du leder efter..." required></textarea>
+          </div>
+          <button type="submit" class="form-submit">Send besked</button>
+        </form>
+        <p id="kontakt-form-status" class="kontakt-form-status" style="display:none"></p>
       </div>
     </div>
   </section>
@@ -764,6 +801,31 @@
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
       revealEls.forEach(function (el) { io.observe(el); });
+    })();
+
+    // Kontakt-formular — siden er 100% statisk (GitHub Pages), så der er
+    // ingen server at sende POST-data til. Bygger i stedet en mailto:-
+    // besked af felterne og åbner besøgendes eget mail-program med den
+    // udfyldt, klar til afsendelse. Ingen ekstern konto/tjeneste nødvendig.
+    (function () {
+      var form = document.getElementById('kontakt-form');
+      var statusEl = document.getElementById('kontakt-form-status');
+      if (!form || !statusEl) return;
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var navn = form.elements['navn'].value.trim();
+        var email = form.elements['email'].value.trim();
+        var besked = form.elements['besked'].value.trim();
+        var subject = 'Henvendelse fra ' + navn;
+        var body = besked + '\n\n— ' + navn + ' (' + email + ')';
+        var mailtoUrl = 'mailto:rune@rccoaching.dk'
+          + '?subject=' + encodeURIComponent(subject)
+          + '&body=' + encodeURIComponent(body);
+        window.location.href = mailtoUrl;
+        statusEl.textContent = 'Din mail-app åbner nu med beskeden udfyldt — tryk send der for at fuldføre.';
+        statusEl.classList.remove('error');
+        statusEl.style.display = 'block';
+      });
     })();
   </script>
 </body>
