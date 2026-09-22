@@ -1,0 +1,5 @@
+# radichcoaching.dk — alt må gerne findes af søgemaskiner.
+User-agent: *
+Allow: /
+
+Sitemap: https://radichcoaching.dk/sitemap.xml
