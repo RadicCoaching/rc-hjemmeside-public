@@ -336,6 +336,40 @@
     }
     .appen-note { margin-top: 20px; font-size: 13px; color: var(--lightgray); font-style: italic; text-align: center; }
 
+    /* ── MIN EGEN VEJ (trin 6, 29.09) ── Runes eget mål: Strong Viking Frankfurt 3/7-2027. Nedtællingen regnes i browseren
+       (dansk dato); uden JavaScript står datoen alene. Billedet: Strong Viking juli 2026, foto Helmut Bauer (Runes billeder). */
+    .vej { padding: 120px 48px; }
+    .vej-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: center; }
+    .vej-tekst .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 28px; }
+    .vej-tekst p { color: var(--lightgray); font-size: 17px; line-height: 1.8; margin-bottom: 18px; max-width: 520px; }
+    .vej-tekst p.lead { color: var(--white); font-size: 19px; }
+    .vej-maal { display: inline-flex; align-items: baseline; gap: 12px; margin-top: 12px; padding: 16px 22px; border: 1px solid #2a2a2a; }
+    .vej-maal strong { font-weight: 900; font-size: 44px; line-height: 1; color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .vej-maal span { font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--lightgray); }
+    .vej-foto { margin: 0; }
+    .vej-foto img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; }
+    .vej-foto-raekke { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+    .vej-foto-raekke img { aspect-ratio: 1 / 1; }
+    .vej-foto figcaption { margin-top: 10px; font-size: 12px; color: var(--lightgray); letter-spacing: 0.04em; }
+
+    /* ── SPØRGSMÅL (trin 6, 29.09) ── Foldes ud med <details> (intet JavaScript). Svarene følger handelsbetingelserne og reglen
+       om, at intet står som noget man "får" (CLAUDE.md 29.09, tjek 10). */
+    .spm { padding: 120px 48px; }
+    .spm-inner { max-width: 820px; margin: 0 auto; }
+    .spm .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 40px; }
+    .spm details { border-top: 1px solid #2a2a2a; }
+    .spm details:last-of-type { border-bottom: 1px solid #2a2a2a; }
+    .spm summary {
+      list-style: none; cursor: pointer; padding: 22px 40px 22px 0; position: relative;
+      font-weight: 700; font-size: 18px; color: var(--white);
+    }
+    .spm summary::-webkit-details-marker { display: none; }
+    .spm summary::after { content: '+'; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 26px; font-weight: 400; }
+    .spm details[open] summary::after { content: '−'; }
+    .spm summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+    .spm details p { color: var(--lightgray); font-size: 17px; line-height: 1.7; padding: 0 40px 22px 0; }
+    .spm details a { color: var(--accent); }
+
     /* ── OM MIG ── */
     .om-mig { padding: 120px 48px; background: var(--darkgray); }
     .om-mig-inner {
@@ -579,7 +613,8 @@
       /* Samme fejltype som "FORTRYDELS" (fundet under trin 2, 29.09): 40 px-minimum klippede "PAKKELØSNINGER." (88 px ved 320)
          og "TAGE EN SNAK." (15 px). Alle sektionsoverskrifter følger nu skærmen — ens størrelse, 40 px som før fra ~420 px. */
       .metode-header .section-headline, .om-mig-left .section-headline,
-      .services-top .section-headline, .kontakt-left .section-headline { font-size: clamp(28px, calc(11vw - 6px), 40px); }
+      .services-top .section-headline, .kontakt-left .section-headline,
+      .vej-tekst .section-headline, .spm .section-headline, .appen-tekst .section-headline { font-size: clamp(28px, calc(11vw - 6px), 40px); }
       .hero-body p:first-child { font-size: 18px; }
       .values-strip { grid-template-columns: repeat(2, 1fr); }
       .value-item { padding: 8px 16px; border-right: none; border-bottom: 1px solid #2a2a2a; }
@@ -613,6 +648,13 @@
       .appen-skaerme::-webkit-scrollbar { display: none; }
       .appen-skaerm { scroll-snap-align: center; }
       .appen-note { padding: 0 24px; }
+
+      .vej { padding: 80px 24px; }
+      .vej-inner { grid-template-columns: 1fr; gap: 40px; }
+      .vej-foto { order: -1; }
+      .vej-maal strong { font-size: 36px; }
+      .spm { padding: 80px 24px; }
+      .spm summary { font-size: 17px; }
 
       .kontakt { padding: 80px 24px; }
       .kontakt-inner { grid-template-columns: 1fr; gap: 48px; }
@@ -745,6 +787,28 @@
     </div>
   </section>
 
+  <!-- MIN EGEN VEJ (trin 6, 29.09) -->
+  <section class="vej" id="vej">
+    <div class="vej-inner reveal-stagger">
+      <div class="vej-tekst reveal">
+        <span class="section-label">Min egen vej</span>
+        <h2 class="section-headline">Jeg står selv<br>på startlinjen.</h2>
+        <p class="lead">Næste mål: Strong Viking Frankfurt, 3. juli 2027. Forhindringer, mudder og bakker — og 12 måneders træning, der skal holde hele vejen.</p>
+        <p>Jeg træner efter samme metode og i den samme app, som mine klienter bruger. Jeg ved, hvad det kræver at møde op — også de dage, hvor det ikke passer.</p>
+        <p class="vej-maal" aria-live="polite"><strong id="vej-dage">3. juli 2027</strong><span id="vej-tekst">Frankfurt</span></p>
+      </div>
+      <figure class="vej-foto reveal">
+        <img src="billeder/strong-viking.webp" width="800" height="1000" loading="lazy" decoding="async" alt="Rune Radich, mudret og smilende med knyttet hånd efter en forhindring ved Strong Viking">
+        <div class="vej-foto-raekke">
+          <img src="billeder/sv-reb.webp" width="600" height="600" loading="lazy" decoding="async" alt="Rune klatrer op ad et reb på en skrå væg">
+          <img src="billeder/sv-mudder.webp" width="600" height="600" loading="lazy" decoding="async" alt="Rune kæmper sig gennem en mudderpøl ved Strong Viking">
+          <img src="billeder/sv-skjold.webp" width="600" height="600" loading="lazy" decoding="async" alt="Rune løber med et træskjold og en træklods">
+        </div>
+        <figcaption>Strong Viking, juli 2026 · Foto: Helmut Bauer, Vinzenz Neugebauer, Ryan Sleiman og Martin Kerstan</figcaption>
+      </figure>
+    </div>
+  </section>
+
   <!-- SERVICES -->
   <section class="services" id="services">
     <div class="services-inner">
@@ -820,6 +884,42 @@
         </div>
         <p class="appen-note">Nyt program september 26 mod Strong Viking 27</p>
       </div>
+    </div>
+  </section>
+
+  <!-- SPØRGSMÅL (trin 6, 29.09): svarene kommer fra handelsbetingelserne og sidens egne tekster — intet som noget man "får" -->
+  <section class="spm" id="spoergsmaal">
+    <div class="spm-inner reveal">
+      <span class="section-label">Spørgsmål</span>
+      <h2 class="section-headline">Det, folk<br>spørger om.</h2>
+      <details>
+        <summary>Hvad koster det?</summary>
+        <p>Det afhænger af, hvad dit forløb skal indeholde. Efter forsamtalen får du et tilbud på mail med en fast pris. Ingen abonnementer — du binder dig aldrig til at betale løbende.</p>
+      </details>
+      <details>
+        <summary>Er forsamtalen gratis?</summary>
+        <p>Ja. Den er gratis og uforpligtende — på telefon, video eller ved et møde.</p>
+      </details>
+      <details>
+        <summary>Hvor træner vi?</summary>
+        <p>Fysisk træning foregår i Lemvig og omegn. Hvor præcis, aftaler vi til forsamtalen.</p>
+      </details>
+      <details>
+        <summary>Hvor tit træner vi?</summary>
+        <p>Det aftaler vi til forsamtalen — ud fra dit mål, din hverdag og det, du har brug for.</p>
+      </details>
+      <details>
+        <summary>Skal jeg være i form for at starte?</summary>
+        <p>Nej. Vi starter, hvor du er — og bygger op derfra.</p>
+      </details>
+      <details>
+        <summary>Kan jeg få online coaching?</summary>
+        <p>Kun efter særlig aftale. Skriv til mig, så finder vi ud af det.</p>
+      </details>
+      <details>
+        <summary>Kan jeg fortryde?</summary>
+        <p>Ja. Du har 14 dages fortrydelsesret, og forløbet starter først, når de 14 dage er gået. Læs mere i <a href="handelsbetingelser.html">handelsbetingelserne</a>.</p>
+      </details>
     </div>
   </section>
 
@@ -960,6 +1060,18 @@
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
       revealEls.forEach(function (el) { io.observe(el); });
+    })();
+
+    // Nedtælling til Strong Viking Frankfurt (trin 6, 29.09): hele dage efter dansk kalender; efter løbet står kun datoen.
+    (function () {
+      var el = document.getElementById('vej-dage'), txt = document.getElementById('vej-tekst');
+      if (!el || !txt) return;
+      var nu = new Date();
+      var idag = Date.UTC(nu.getFullYear(), nu.getMonth(), nu.getDate());
+      var dage = Math.round((Date.UTC(2027, 6, 3) - idag) / 86400000);
+      if (dage > 1) { el.textContent = String(dage); txt.textContent = 'dage til start i Frankfurt'; }
+      else if (dage === 1) { el.textContent = '1'; txt.textContent = 'dag til start i Frankfurt'; }
+      else if (dage === 0) { el.textContent = 'I dag'; txt.textContent = 'Strong Viking Frankfurt'; }
     })();
 
     // "Skriv til mig" (trin 2, 29.09 — "one touch"): på en telefon åbner knapperne mailen direkte med emnet udfyldt (1 tryk i
