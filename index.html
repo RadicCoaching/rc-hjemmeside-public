@@ -304,6 +304,32 @@
     }
     .metode-card:hover .metode-accent-line { width: 56px; }
 
+    /* ── APPEN (trin 3, 29.09) ── Tre rigtige skærme fra Runes eget program + en liste, der udvides, når appen får nye
+       funktioner (Rune 29.09). Billederne er filer i billeder/ (ikke base64), lazy-loaded; på mobil swipes de (scroll-snap,
+       intet JavaScript). */
+    .appen { padding: 120px 48px; }
+    .appen-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.15fr; gap: 72px; align-items: center;
+    }
+    .appen-tekst .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 28px; }
+    .appen-tekst p.lead { color: var(--white); font-size: 19px; line-height: 1.7; margin-bottom: 28px; max-width: 480px; }
+    .appen-liste { list-style: none; display: grid; gap: 14px; }
+    .appen-liste li { display: grid; grid-template-columns: 6px 1fr; column-gap: 16px; color: var(--lightgray); font-size: 17px; line-height: 1.6; }
+    .appen-liste li::before { content: ''; width: 6px; height: 6px; background: var(--accent); margin-top: 11px; }
+    .appen-skaerme { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 18px; margin: 0; }
+    .appen-skaerm { margin: 0; }
+    .appen-skaerm .telefon {
+      border: 1px solid #2a2a2a; border-radius: 30px; padding: 7px; background: #111;
+      box-shadow: 0 30px 60px -30px rgba(0,0,0,0.9);
+    }
+    .appen-skaerm img { display: block; width: 100%; height: auto; aspect-ratio: 600 / 1220; border-radius: 24px; background: var(--darkgray); }
+    .appen-skaerm figcaption {
+      margin-top: 12px; text-align: center; font-size: 11px; font-weight: 600;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--lightgray);
+    }
+    .appen-note { margin-top: 20px; font-size: 13px; color: var(--lightgray); font-style: italic; text-align: center; }
+
     /* ── OM MIG ── */
     .om-mig { padding: 120px 48px; background: var(--darkgray); }
     .om-mig-inner {
@@ -570,6 +596,18 @@
       .services-point { border-right: none; border-bottom: 1px solid #2a2a2a; }
       .services-point:last-child { border-bottom: none; }
 
+      .appen { padding: 80px 0; }
+      .appen-inner { grid-template-columns: 1fr; gap: 40px; }
+      .appen-tekst { padding: 0 24px; }
+      /* Én telefon ad gangen med et glimt af den næste — swipe (scroll-snap) */
+      .appen-skaerme {
+        grid-auto-columns: 68%; overflow-x: auto; scroll-snap-type: x mandatory;
+        padding: 0 24px 8px; scroll-padding: 0 24px; scrollbar-width: none;
+      }
+      .appen-skaerme::-webkit-scrollbar { display: none; }
+      .appen-skaerm { scroll-snap-align: center; }
+      .appen-note { padding: 0 24px; }
+
       .kontakt { padding: 80px 24px; }
       .kontakt-inner { grid-template-columns: 1fr; gap: 48px; }
       .kontakt-right { padding: 36px 24px; }
@@ -737,6 +775,42 @@
           <h3>Mindset-arbejde</h3>
           <p>Kroppen gør hvad sindet tillader. Vi arbejder med begge — det er det der holder på den lange bane.</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APPEN (trin 3, 29.09): rigtige skærme fra Runes EGET program (ingen klient) — tages om, når der er flere data.
+       Listen udvides, når appen får nye funktioner (Rune 29.09). -->
+  <section class="appen" id="appen">
+    <div class="appen-inner reveal-stagger">
+      <div class="appen-tekst reveal">
+        <span class="section-label">Appen</span>
+        <h2 class="section-headline">Din træning.<br>I lommen.</h2>
+        <p class="lead">Du får din egen app fra første dag. Dit program, dine tal og mig — samlet ét sted.</p>
+        <ul class="appen-liste">
+          <li>Dit program uge for uge, med dagens vægt og tal</li>
+          <li>Rekorder fejres automatisk, når du slår dem</li>
+          <li>Ugemål, så vi holder kursen sammen</li>
+          <li>Vis mig din træning: send en video, få feedback</li>
+          <li>Kostlog med billeder</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="appen-skaerme" tabindex="0" aria-label="Skærmbilleder fra appen — swipe for at se flere">
+          <figure class="appen-skaerm">
+            <div class="telefon"><img src="billeder/app-1-program.webp" width="600" height="1220" loading="lazy" decoding="async" alt="Appen: Lang tur — uge 1 af 8, 10 km, og næste uge 12 km"></div>
+            <figcaption>Ugens program</figcaption>
+          </figure>
+          <figure class="appen-skaerm">
+            <div class="telefon"><img src="billeder/app-2-maal.webp" width="600" height="1220" loading="lazy" decoding="async" alt="Appen: forsiden med en hilsen fra Rune og ugens træningsmål"></div>
+            <figcaption>Ugens mål</figcaption>
+          </figure>
+          <figure class="appen-skaerm">
+            <div class="telefon"><img src="billeder/app-3-fremgang.webp" width="600" height="1220" loading="lazy" decoding="async" alt="Appen: Fremgang — mål nået undervejs og træninger i alt"></div>
+            <figcaption>Din fremgang</figcaption>
+          </figure>
+        </div>
+        <p class="appen-note">Nyt program september 26 mod Strong Viking 27</p>
       </div>
     </div>
   </section>
