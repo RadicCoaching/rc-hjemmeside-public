@@ -149,7 +149,8 @@
     .nav-toggle {
       display: none;
       flex-direction: column; justify-content: center; gap: 5px;
-      width: 32px; height: 28px; background: none; border: none; padding: 0;
+      /* 48x44 trykflade (fingerens minimum er 44x44) — stregerne er stadig 32 px brede (trin 1, 29.09) */
+      width: 48px; height: 44px; background: none; border: none; padding: 8px; margin-right: -8px;
       cursor: pointer; z-index: 101;
     }
     .nav-toggle span {
@@ -198,6 +199,7 @@
       opacity: 0; animation: fadeUp 0.7s ease forwards 0.35s;
     }
     .hero-headline .accent-word { color: var(--accent); display: block; }
+    .hero-headline .br-mobil { display: none; }
     .hero-divider {
       width: 60px; height: 2px; background: var(--lightgray); margin-bottom: 32px;
       opacity: 0; animation: fadeUp 0.6s ease forwards 0.5s;
@@ -472,11 +474,11 @@
     }
     .footer-legal-links { display: flex; gap: 24px; }
     .footer-legal-links a {
-      font-size: 13px; color: #444; text-decoration: none; letter-spacing: 0.02em;
+      font-size: 13px; color: var(--lightgray); text-decoration: none; letter-spacing: 0.02em;
       transition: color 0.2s;
     }
-    .footer-legal-links a:hover { color: var(--lightgray); }
-    .footer-text { font-size: 13px; color: #444; letter-spacing: 0.04em; }
+    .footer-legal-links a:hover { color: var(--white); }
+    .footer-text { font-size: 13px; color: var(--lightgray); letter-spacing: 0.04em; }
 
     /* ── ANIMATIONS ── */
     @keyframes fadeUp {
@@ -522,6 +524,19 @@
       .nav-links li { border-bottom: 1px solid #2a2a2a; }
       .nav-links a { display: block; padding: 16px 0; font-size: 15px; }
       .hero { padding: 120px 24px 0; }
+      /* Trin 1 (29.09): overskriften passer til skærmen (før klippede 56 px-minimum "FORTRYDELS" af på alle telefoner) */
+      .hero-headline { font-size: clamp(34px, 10.2vw, 120px); margin-bottom: 24px; }
+      /* Strammere luft på mobil, så "Skriv til mig" ses uden at scrolle — også med Safaris værktøjslinjer fremme */
+      .hero { padding-top: 100px; }
+      .hero-eyebrow { margin-bottom: 16px; }
+      .hero-divider { margin-bottom: 24px; }
+      .hero-tagline { margin-top: 20px; font-size: 18px; }
+      .hero-cta { margin-top: 28px; }
+      .hero-headline .accent-word { display: inline; }
+      .hero-headline .br-mobil { display: inline; }
+      .hero-headline .br-desktop { display: none; }
+      /* Lodret mørkt lag på mobil: teksten fylder hele bredden, så det vandrette lag efterlod afsnit 2 med 1,9:1 kontrast */
+      .hero-overlay { background: linear-gradient(to bottom, rgba(12,12,12,0.85) 0%, rgba(12,12,12,0.70) 100%); }
       .hero-body p { font-size: 16px; }
       .hero-body p:first-child { font-size: 18px; }
       .values-strip { grid-template-columns: repeat(2, 1fr); }
@@ -575,17 +590,18 @@
     <div class="hero-overlay"></div>
     <div class="hero-content">
       <p class="hero-eyebrow">Radich Coaching</p>
+      <!-- Bevidste linjeskift (trin 1, 29.09): desktop "FORTRYDELSE ER / DET DYRESTE / DU EJER." som før; mobil
+           "FORTRYDELSE / ER DET DYRESTE / DU EJER." — før stod "ER" alene på sin egen linje. -->
       <h1 class="hero-headline">
-        Fortrydelse er<br>
-        <span class="accent-word">det dyreste</span>
+        Fortrydelse<br class="br-mobil"> er<br class="br-desktop">
+        <span class="accent-word">det dyreste</span><br class="br-mobil">
         du ejer.
       </h1>
       <div class="hero-divider"></div>
       <div class="hero-body">
         <p>Den sidder i kroppen, i spejlet, i de valg du ikke tog.</p>
         <p>Jeg er Rune. Jeg coacher dig tilbage til dig selv — uden omsvøb, uden facade.</p>
-        <p>Du behøver ikke starte stort. Du skal bare starte.</p>
-        <p>Igen og igen ser jeg mennesker finde styrke og overskud de havde glemt var der — med små skridt der faktisk holder.</p>
+        <!-- De to sidste afsnit er flyttet ned i Om mig (trin 1, 29.09), så "Skriv til mig" kan ses uden at scrolle. -->
         <span class="hero-tagline">Små skridt. Store forandringer.</span>
       </div>
       <div class="hero-cta">
@@ -656,6 +672,8 @@
           <p>Den rejse lærte mig, at fremskridt ikke handler om aldrig at falde. Det handler om at rejse sig igen — og at have nogen der holder øje med, at du gør det.</p>
           <p>I dag kan jeg dødløfte igen. Jeg løber OCR. Jeg kan løfte mine børn.</p>
           <p>Og jeg bruger alt det, jeg er — fejlene, kampene, vejen tilbage — i mit arbejde som coach.</p>
+          <p>Igen og igen ser jeg mennesker finde styrke og overskud de havde glemt var der — med små skridt der faktisk holder.</p>
+          <p>Du behøver ikke starte stort. Du skal bare starte.</p>
           <span class="om-mig-tagline">Ikke som facade. Som fundament.</span>
         </div>
       </div>
