@@ -391,6 +391,12 @@
     .kontakt-left .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 32px; }
     .kontakt-left p { color: var(--lightgray); font-size: 18px; line-height: 1.7; margin-bottom: 16px; }
     .kontakt-left p.lead { color: var(--white); }
+    /* "Sådan foregår det" (trin 2, 29.09): tre skridt lige ved formularen, hvor tvivlen opstår ("hvad sker der, hvis jeg skriver?") */
+    .kontakt-trin { list-style: none; counter-reset: trin; margin: 8px 0 24px; display: grid; gap: 16px; }
+    .kontakt-trin li { counter-increment: trin; display: grid; grid-template-columns: 32px 1fr; column-gap: 12px; align-items: baseline; }
+    .kontakt-trin li::before { content: counter(trin); grid-row: span 2; font-weight: 900; font-size: 22px; line-height: 1; color: var(--accent); }
+    .kontakt-trin strong { color: var(--white); font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
+    .kontakt-trin span { color: var(--lightgray); font-size: 16px; line-height: 1.6; }
 
     .kontakt-channels { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; }
     .kontakt-channel {
@@ -538,6 +544,10 @@
       /* Lodret mørkt lag på mobil: teksten fylder hele bredden, så det vandrette lag efterlod afsnit 2 med 1,9:1 kontrast */
       .hero-overlay { background: linear-gradient(to bottom, rgba(12,12,12,0.85) 0%, rgba(12,12,12,0.70) 100%); }
       .hero-body p { font-size: 16px; }
+      /* Samme fejltype som "FORTRYDELS" (fundet under trin 2, 29.09): 40 px-minimum klippede "PAKKELØSNINGER." (88 px ved 320)
+         og "TAGE EN SNAK." (15 px). Alle sektionsoverskrifter følger nu skærmen — ens størrelse, 40 px som før fra ~420 px. */
+      .metode-header .section-headline, .om-mig-left .section-headline,
+      .services-top .section-headline, .kontakt-left .section-headline { font-size: clamp(28px, calc(11vw - 6px), 40px); }
       .hero-body p:first-child { font-size: 18px; }
       .values-strip { grid-template-columns: repeat(2, 1fr); }
       .value-item { padding: 8px 16px; border-right: none; border-bottom: 1px solid #2a2a2a; }
@@ -738,7 +748,11 @@
         <span class="section-label">Kontakt</span>
         <h2 class="section-headline">Lad os<br>tage en snak.</h2>
         <p class="lead">Ingen forpligtelse. Ingen salgspitch.</p>
-        <p>Skriv til mig og fortæl lidt om hvor du er, og hvad du vil. Så vender jeg tilbage.</p>
+        <ol class="kontakt-trin" aria-label="Sådan foregår det">
+          <li><strong>Du skriver</strong><span>Fortæl lidt om hvor du er, og hvad du vil.</span></li>
+          <li><strong>Vi tager en snak</strong><span>Uforpligtende. Vi finder ud af, hvad der giver mening for dig.</span></li>
+          <li><strong>Du går i gang</strong><span>Siger du ja, ligger dit program klar i appen fra første træning.</span></li>
+        </ol>
         <p class="kontakt-sted">Fysisk træning i Lemvig og omegn. Coaching efter aftale.</p>
 
         <div class="kontakt-channels">
@@ -864,6 +878,19 @@
         });
       }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
       revealEls.forEach(function (el) { io.observe(el); });
+    })();
+
+    // "Skriv til mig" (trin 2, 29.09 — "one touch"): på en telefon åbner knapperne mailen direkte med emnet udfyldt (1 tryk i
+    // stedet for rul + 3 felter + send). På en computer — og uden JavaScript — fører de stadig ned til Kontakt (formularen og
+    // mailadressen), fordi et mail-link intet gør på en computer uden mailprogram. Ingen data forlader telefonen.
+    (function () {
+      if (!window.matchMedia || !window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+      var mail = 'mailto:rune@radichcoaching.dk'
+        + '?subject=' + encodeURIComponent('Lad os tage en snak')
+        + '&body=' + encodeURIComponent('Hej Rune\n\nKort om mig, og hvad jeg gerne vil:\n\n');
+      Array.prototype.forEach.call(document.querySelectorAll('a.btn-primary[href="#kontakt"]'), function (a) {
+        a.setAttribute('href', mail);
+      });
     })();
 
     // Kontakt-formular — siden er 100% statisk (GitHub Pages), så der er
