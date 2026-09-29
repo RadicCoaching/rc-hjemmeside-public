@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Sikkerhedsregel (trin 5, 29.09): browseren kører kun sidens egne scripts og de godkendte undtagelser. Holdes rigtig af tests/tjek.js (tjek 11); ret med: node tests/tjek.js --ret-csp -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NvIEPXzNglr6mTjNhMVemH4pK6Jq7Kvebx3tWZwJYp0=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
   <title>Personlig træner i Lemvig og omegn — Radich Coaching</title>
   <!-- Delebillede (trin 4, 29.09): når siden deles i Messenger/Facebook/sms, vises billeder/delebillede.jpg (1200x630) med
        Rune og hero-sætningen. Muligt nu, fordi billederne er pakket ud af HTML-filen (før: data:-URI uden adresse). -->
@@ -13,6 +15,8 @@
   <link rel="canonical" href="https://radichcoaching.dk/">
   <!-- Hero-billedet er sidens største element: hent det med det samme (før CSS'en er læst) -->
   <link rel="preload" as="image" href="billeder/hero.webp" type="image/webp" fetchpriority="high">
+  <!-- Trin 5 (29.09): skriften hentes med det samme, så hero-overskriften ikke først vises i systemskrift og så "blinker" over i Inter -->
+  <link rel="preload" as="font" href="fonts/Inter-latin.woff2" type="font/woff2" crossorigin>
   <meta property="og:url" content="https://radichcoaching.dk/">
   <meta property="og:locale" content="da_DK">
   <meta property="og:site_name" content="Radich Coaching">
@@ -104,7 +108,9 @@
       background-color: var(--black);
       color: var(--white);
       font-family: 'Inter', sans-serif;
-      font-size: 16px;
+      /* Trin 5 (29.09): 1rem i stedet for 16px (og rem i brødteksten nedenfor), så siden følger browserens tekststørrelse.
+         Ved standardindstillingen er 1rem = 16px — siden ser ens ud. */
+      font-size: 1rem;
       line-height: 1.6;
       overflow-x: hidden;
     }
@@ -116,15 +122,21 @@
       padding: 24px 48px;
       background: linear-gradient(to bottom, rgba(12,12,12,0.95) 0%, rgba(12,12,12,0) 100%);
       border-bottom: 1px solid transparent;
-      transition: background 0.35s ease, backdrop-filter 0.35s ease, border-color 0.35s ease;
+      transition: background 0.35s ease, border-color 0.35s ease;
     }
     /* Bliver til en mørk, blurret bjælke når man scroller ned — se
        script i bunden ("scrolled"-klasse ved scrollY > 40). */
     nav.scrolled {
       background: rgba(12,12,12,0.82);
-      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
       border-bottom-color: #1a1a1a;
     }
+    /* Trin 5 (29.09): sløringen ligger på et lag BAG nav'ens indhold — ikke på <nav> selv. backdrop-filter på <nav> gjorde den til
+       ramme for den faste mobilmenu, så menuen kun blev 132 px høj (i stedet for hele skærmen), når man havde scrollet ned. */
+    nav::before {
+      content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+      transition: backdrop-filter 0.35s ease, -webkit-backdrop-filter 0.35s ease;
+    }
+    nav.scrolled::before { backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
     .nav-logo {
       font-family: 'Inter', sans-serif;
       font-weight: 900; font-size: 28px; letter-spacing: 0.02em;
@@ -165,6 +177,15 @@
     .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
     .nav-toggle.open span:nth-child(2) { opacity: 0; }
     .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Trin 5 (29.09): tydelig fokus-ring for tastaturet overalt (musen og fingeren får den ikke). Gul på mørk bund; hvid på de
+       gule knapper, hvor en gul ring ville forsvinde. */
+    a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .btn-primary:focus-visible, .form-submit:focus-visible { outline-color: var(--white); }
+    .nav-backdrop { display: none; }
+
+    /* Trin 5 (29.09): et menuklik lander altid med luft under menubjælken (før: tilfældigt 5 px bag den på mobil) */
+    section[id] { scroll-margin-top: 24px; }
 
     /* ── HERO ── */
     .hero {
@@ -209,8 +230,8 @@
       opacity: 0; animation: fadeUp 0.6s ease forwards 0.5s;
     }
     .hero-body { max-width: 560px; opacity: 0; animation: fadeUp 0.7s ease forwards 0.6s; }
-    .hero-body p { color: var(--lightgray); font-size: 18px; line-height: 1.7; margin-bottom: 16px; }
-    .hero-body p:first-child { color: var(--white); font-size: 20px; }
+    .hero-body p { color: var(--lightgray); font-size: 1.125rem; line-height: 1.7; margin-bottom: 16px; }
+    .hero-body p:first-child { color: var(--white); font-size: 1.25rem; }
     .hero-tagline {
       font-family: 'Inter', sans-serif;
       font-weight: 700; font-size: 22px; letter-spacing: 0.04em; text-transform: uppercase;
@@ -281,8 +302,8 @@
     .metode-inner { max-width: 1100px; margin: 0 auto; }
     .metode-header { margin-bottom: 72px; }
     .metode-header .section-headline { font-size: clamp(40px, 5vw, 72px); max-width: 700px; }
-    .metode-header p { color: var(--lightgray); font-size: 18px; line-height: 1.7; max-width: 560px; margin-top: 24px; }
-    .metode-grid { display: grid; grid-template-columns: repeat(3, 1fr); border: 1px solid #2a2a2a; }
+    .metode-header p { color: var(--lightgray); font-size: 1.125rem; line-height: 1.7; max-width: 560px; margin-top: 24px; }
+    .metode-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1px solid #2a2a2a; }
     .metode-card {
       padding: 48px 40px; border-right: 1px solid #2a2a2a; position: relative;
       transition: background 0.35s ease;
@@ -301,12 +322,20 @@
       margin-bottom: 16px; position: relative; z-index: 1;
     }
     .metode-card h3 span { color: var(--accent); }
-    .metode-card p { color: var(--lightgray); font-size: 16px; line-height: 1.7; position: relative; z-index: 1; }
+    .metode-card p { color: var(--lightgray); font-size: 1rem; line-height: 1.7; position: relative; z-index: 1; }
     .metode-accent-line {
       width: 32px; height: 2px; background: var(--accent); margin-bottom: 24px;
       transition: width 0.35s ease;
     }
     .metode-card:hover .metode-accent-line { width: 56px; }
+    /* Trin 5 (29.09, fund fra gennemgangen): tre lige brede kort på iPad/tablet (769–1040 px) gav ikke plads til "ANSVARLIGHED"
+       (219 px ved 28 px) og "TRÆNINGSPROGRAM" (226 px ved 20 px) — de stak ud over stregen. Skrift og luft følger bredden her.
+       overflow-wrap er kun sidste udvej (bryder først, hvis et ord ellers ville stikke ud). */
+    .metode-card h3, .services-point h3 { overflow-wrap: break-word; }
+    @media (min-width: 769px) and (max-width: 1040px) {
+      .metode-card { padding: 40px 24px; }
+      .metode-card h3 { font-size: clamp(20px, 2.7vw, 28px); }
+    }
 
     /* ── APPEN (trin 3, 29.09) ── Tre rigtige skærme fra Runes eget program + en liste, der udvides, når appen får nye
        funktioner (Rune 29.09). Billederne er filer i billeder/ (ikke base64), lazy-loaded; på mobil swipes de (scroll-snap,
@@ -317,11 +346,11 @@
       display: grid; grid-template-columns: 1fr 1.15fr; gap: 72px; align-items: center;
     }
     .appen-tekst .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 28px; }
-    .appen-tekst p.lead { color: var(--white); font-size: 19px; line-height: 1.7; margin-bottom: 28px; max-width: 480px; }
+    .appen-tekst p.lead { color: var(--white); font-size: 1.1875rem; line-height: 1.7; margin-bottom: 28px; max-width: 480px; }
     .appen-intro { color: var(--lightgray); font-size: 15px; margin-bottom: 14px; }
     .appen-aftale { color: var(--white); font-size: 16px; line-height: 1.6; margin-top: 24px; max-width: 480px; }
     .appen-liste { list-style: none; display: grid; gap: 14px; }
-    .appen-liste li { display: grid; grid-template-columns: 6px 1fr; column-gap: 16px; color: var(--lightgray); font-size: 17px; line-height: 1.6; }
+    .appen-liste li { display: grid; grid-template-columns: 6px 1fr; column-gap: 16px; color: var(--lightgray); font-size: 1.0625rem; line-height: 1.6; }
     .appen-liste li::before { content: ''; width: 6px; height: 6px; background: var(--accent); margin-top: 11px; }
     .appen-skaerme { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 18px; margin: 0; }
     .appen-skaerm { margin: 0; }
@@ -341,8 +370,8 @@
     .vej { padding: 120px 48px; }
     .vej-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1.1fr 1fr; gap: 72px; align-items: center; }
     .vej-tekst .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 28px; }
-    .vej-tekst p { color: var(--lightgray); font-size: 17px; line-height: 1.8; margin-bottom: 18px; max-width: 520px; }
-    .vej-tekst p.lead { color: var(--white); font-size: 19px; }
+    .vej-tekst p { color: var(--lightgray); font-size: 1.0625rem; line-height: 1.8; margin-bottom: 18px; max-width: 520px; }
+    .vej-tekst p.lead { color: var(--white); font-size: 1.1875rem; }
     .vej-maal { display: inline-flex; align-items: baseline; gap: 12px; margin-top: 12px; padding: 16px 22px; border: 1px solid #2a2a2a; }
     .vej-maal strong { font-weight: 900; font-size: 44px; line-height: 1; color: var(--accent); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
     .vej-maal span { font-size: 12px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase; color: var(--lightgray); }
@@ -367,7 +396,7 @@
     .spm summary::after { content: '+'; position: absolute; right: 4px; top: 50%; transform: translateY(-50%); color: var(--accent); font-size: 26px; font-weight: 400; }
     .spm details[open] summary::after { content: '−'; }
     .spm summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
-    .spm details p { color: var(--lightgray); font-size: 17px; line-height: 1.7; padding: 0 40px 22px 0; }
+    .spm details p { color: var(--lightgray); font-size: 1.0625rem; line-height: 1.7; padding: 0 40px 22px 0; }
     .spm details a { color: var(--accent); }
 
     /* ── OM MIG ── */
@@ -378,8 +407,8 @@
     }
     .om-mig-left .section-headline { font-size: clamp(40px, 4.5vw, 64px); margin-bottom: 40px; }
     .om-mig-left .section-label { margin-bottom: 16px; }
-    .om-mig-text p { color: var(--lightgray); font-size: 17px; line-height: 1.8; margin-bottom: 20px; }
-    .om-mig-text p.lead { color: var(--white); font-size: 19px; }
+    .om-mig-text p { color: var(--lightgray); font-size: 1.0625rem; line-height: 1.8; margin-bottom: 20px; }
+    .om-mig-text p.lead { color: var(--white); font-size: 1.1875rem; }
     .om-mig-tagline {
       font-family: 'Inter', sans-serif; font-weight: 700; font-size: 20px;
       letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent);
@@ -410,22 +439,23 @@
     .services-top .section-headline { font-size: clamp(40px, 5vw, 72px); }
     .services-top .section-label { margin-bottom: 16px; }
     .services-intro { padding-top: 16px; }
-    .services-intro p { color: var(--lightgray); font-size: 18px; line-height: 1.7; margin-bottom: 16px; }
-    .services-intro p.lead { color: var(--white); font-size: 19px; }
-    .services-intro .tagline {
+    .services-intro p { color: var(--lightgray); font-size: 1.125rem; line-height: 1.7; margin-bottom: 16px; }
+    .services-intro p.lead { color: var(--white); font-size: 1.1875rem; }
+    .services .tagline {
       font-family: 'Inter', sans-serif; font-style: italic;
       font-weight: 600; font-size: 17px; color: var(--lightgray);
-      letter-spacing: 0.02em; margin-top: 8px; display: block;
+      letter-spacing: 0.02em; display: block;
     }
-    .services-cta-wrap { margin-top: 40px; }
+    /* Trin 5 (29.09): "Skriv til mig" står EFTER de tre punkter (før bad knappen om kontakten, inden argumenterne kom) */
+    .services-cta-wrap { margin-top: 48px; display: flex; flex-wrap: wrap; align-items: center; gap: 20px 32px; }
 
     .services-divider {
       border: none; border-top: 1px solid #2a2a2a; margin-bottom: 48px;
     }
 
-    /* Tre hvad-du-får punkter */
+    /* De tre punkter */
     .services-points {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 0;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0;
       border: 1px solid #2a2a2a; margin-bottom: 0;
     }
     .services-point {
@@ -445,7 +475,13 @@
       font-size: 20px; text-transform: uppercase; letter-spacing: 0.03em;
       color: var(--white); margin-bottom: 10px;
     }
-    .services-point p { color: var(--lightgray); font-size: 15px; line-height: 1.65; }
+    .services-point p { color: var(--lightgray); font-size: 0.9375rem; line-height: 1.65; }
+    /* Samme som Metodens kort (se dér): "TRÆNINGSPROGRAM" skal kunne stå helt i tre lige brede kort på iPad/tablet.
+       Står EFTER .services-point-reglerne, så den vinder over dem. */
+    @media (min-width: 769px) and (max-width: 1040px) {
+      .services-point { padding: 32px 20px; }
+      .services-point h3 { font-size: clamp(15px, 2vw, 20px); }
+    }
 
     /* ── KONTAKT ── */
     .kontakt { padding: 120px 48px; background: var(--darkgray); }
@@ -455,14 +491,14 @@
     }
     .kontakt-left .section-label { margin-bottom: 16px; }
     .kontakt-left .section-headline { font-size: clamp(40px, 5vw, 72px); margin-bottom: 32px; }
-    .kontakt-left p { color: var(--lightgray); font-size: 18px; line-height: 1.7; margin-bottom: 16px; }
+    .kontakt-left p { color: var(--lightgray); font-size: 1.125rem; line-height: 1.7; margin-bottom: 16px; }
     .kontakt-left p.lead { color: var(--white); }
     /* "Sådan foregår det" (trin 2, 29.09): tre skridt lige ved formularen, hvor tvivlen opstår ("hvad sker der, hvis jeg skriver?") */
     .kontakt-trin { list-style: none; counter-reset: trin; margin: 8px 0 24px; display: grid; gap: 16px; }
     .kontakt-trin li { counter-increment: trin; display: grid; grid-template-columns: 32px 1fr; column-gap: 12px; align-items: baseline; }
     .kontakt-trin li::before { content: counter(trin); grid-row: span 2; font-weight: 900; font-size: 22px; line-height: 1; color: var(--accent); }
     .kontakt-trin strong { color: var(--white); font-size: 15px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
-    .kontakt-trin span { color: var(--lightgray); font-size: 16px; line-height: 1.6; }
+    .kontakt-trin span { color: var(--lightgray); font-size: 1rem; line-height: 1.6; }
 
     .kontakt-channels { margin-top: 48px; display: flex; flex-direction: column; gap: 16px; }
     .kontakt-channel {
@@ -508,14 +544,15 @@
     }
     .form-group input,
     .form-group textarea {
-      width: 100%; background: #141414; border: 1px solid #2a2a2a;
+      /* Trin 5 (29.09): kanten #666 — 3,2:1 mod feltet og 3,4:1 mod boksen (kravet er 3:1; før #2a2a2a = 1,3:1, næsten usynlig) */
+      width: 100%; background: #141414; border: 1px solid #666666;
       color: var(--white); font-family: 'Inter', sans-serif; font-size: 16px;
       padding: 14px 16px; outline: none;
       transition: border-color 0.2s;
       -webkit-appearance: none;
     }
     .form-group input:focus,
-    .form-group textarea:focus { border-color: var(--accent); }
+    .form-group textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
     .form-group textarea { resize: vertical; min-height: 120px; }
     .form-submit {
       width: 100%; background: var(--accent); color: var(--black);
@@ -529,10 +566,15 @@
       box-shadow: 0 12px 32px -12px rgba(196,245,1,0.5);
     }
     .form-submit:disabled { opacity: 0.6; cursor: default; }
+    .form-hjaelp { color: var(--lightgray); font-size: 14px; line-height: 1.6; margin-bottom: 16px; }
+    .form-privat { color: var(--lightgray); font-size: 13px; line-height: 1.6; margin-top: 16px; }
+    .form-privat a { color: var(--lightgray); text-decoration: underline; text-underline-offset: 2px; }
+    .form-privat a:hover { color: var(--white); }
     .kontakt-form-status {
       margin-top: 20px; font-size: 14px; color: var(--accent);
     }
     .kontakt-form-status.error { color: var(--accent-red); }
+    .kontakt-form-status:empty { margin: 0; }
 
     /* ── FOOTER ── */
     footer {
@@ -561,11 +603,14 @@
     /* Scroll-reveal — sætter .is-visible via IntersectionObserver (se script
        i bunden) når elementet kommer ind i viewport. Samme fade+løft-følelse
        som hero allerede har ved indlæsning, nu også for resten af siden. */
+    /* Trin 5 (29.09): elementerne skjules KUN, når scriptet har sat .reveal-klar på <html>. Før stod alt under hero med
+       gennemsigtighed 0 fra start — uden JavaScript (eller hvis scriptet fejler) var hele siden under hero sort. */
     .reveal {
-      opacity: 0; transform: translateY(28px);
       transition: opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1);
     }
-    .reveal.is-visible { opacity: 1; transform: translateY(0); }
+    .reveal-klar .reveal:not(.is-visible):not(:focus-within) { opacity: 0; transform: translateY(28px); }
+    /* Print og "Gem som PDF": IntersectionObserver kører ikke — vis alt */
+    @media print { .reveal-klar .reveal { opacity: 1 !important; transform: none !important; } }
     /* Kaskade-forsinkelse for elementer i et grid (metode-grid, services-points),
        så kortene ikke popper ind samtidig. */
     .reveal-stagger > .reveal:nth-child(1) { transition-delay: 0s; }
@@ -586,13 +631,28 @@
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
       .nav-toggle { display: flex; }
+      /* Trin 5 (29.09): menuen glider ind på 0,25 s over et mørkt lag. Laget ER fladen, man trykker på for at lukke; Escape lukker
+         også, og siden bagved står stille, mens menuen er åben (script i bunden). visibility gør de skjulte links ufokuserbare. */
       .nav-links {
-        display: none; position: fixed; top: 0; right: 0; bottom: 0;
+        display: flex; position: fixed; top: 0; right: 0; bottom: 0;
         width: 240px; flex-direction: column; gap: 0;
         background: var(--black); padding: 100px 32px 32px;
         box-shadow: -4px 0 24px rgba(0,0,0,0.4);
+        transform: translateX(100%); visibility: hidden;
       }
-      .nav-links.open { display: flex; }
+      .nav-links.open { transform: none; visibility: visible; }
+      .nav-backdrop {
+        display: block; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+        opacity: 0; visibility: hidden;
+      }
+      .nav-backdrop.open { opacity: 1; visibility: visible; }
+      /* Overgangen gælder KUN, mens menuen åbnes/lukkes (klassen menu-anim sættes af scriptet i 0,3 s). Uden den gled panelet synligt
+         ud over siden, hver gang en telefon blev drejet fra tværs (computer-layout) til højkant. */
+      .menu-anim .nav-links { transition: transform 0.25s ease, visibility 0s linear 0.25s; }
+      .menu-anim .nav-links.open { transition: transform 0.25s ease, visibility 0s; }
+      .menu-anim .nav-backdrop { transition: opacity 0.25s ease, visibility 0s linear 0.25s; }
+      .menu-anim .nav-backdrop.open { transition: opacity 0.25s ease, visibility 0s; }
+      html.menu-aaben { overflow: hidden; }
       .nav-links li { border-bottom: 1px solid #2a2a2a; }
       .nav-links a { display: block; padding: 16px 0; font-size: 15px; }
       .hero { padding: 120px 24px 0; }
@@ -609,36 +669,40 @@
       .hero-headline .br-desktop { display: none; }
       /* Lodret mørkt lag på mobil: teksten fylder hele bredden, så det vandrette lag efterlod afsnit 2 med 1,9:1 kontrast */
       .hero-overlay { background: linear-gradient(to bottom, rgba(12,12,12,0.85) 0%, rgba(12,12,12,0.70) 100%); }
-      .hero-body p { font-size: 16px; }
+      .hero-body p { font-size: 1rem; }
       /* Samme fejltype som "FORTRYDELS" (fundet under trin 2, 29.09): 40 px-minimum klippede "PAKKELØSNINGER." (88 px ved 320)
          og "TAGE EN SNAK." (15 px). Alle sektionsoverskrifter følger nu skærmen — ens størrelse, 40 px som før fra ~420 px. */
       .metode-header .section-headline, .om-mig-left .section-headline,
       .services-top .section-headline, .kontakt-left .section-headline,
       .vej-tekst .section-headline, .spm .section-headline, .appen-tekst .section-headline { font-size: clamp(28px, calc(11vw - 6px), 40px); }
-      .hero-body p:first-child { font-size: 18px; }
+      .hero-body p:first-child { font-size: 1.125rem; }
       .values-strip { grid-template-columns: repeat(2, 1fr); }
       .value-item { padding: 8px 16px; border-right: none; border-bottom: 1px solid #2a2a2a; }
       .value-item:nth-child(3), .value-item:last-child { border-bottom: none; }
 
       .metode { padding: 80px 24px; }
-      .metode-grid { grid-template-columns: 1fr; }
-      .metode-card { border-right: none; border-bottom: 1px solid #2a2a2a; }
+      /* Trin 5 (29.09): minmax(0, 1fr) — et langt ord kan ikke længere skubbe hele siden bredere (før 43 px for bred ved 320 px:
+         "ANSVARLIGHED", "TRÆNINGSPROGRAM" og mailadressen). Skrift og luft er skruet lidt ned, så ordene står hele. */
+      .metode-grid { grid-template-columns: minmax(0, 1fr); }
+      .metode-card { border-right: none; border-bottom: 1px solid #2a2a2a; padding: 40px 24px; }
+      .metode-card h3 { font-size: clamp(22px, 8.2vw, 28px); }
       .metode-card:last-child { border-bottom: none; }
 
       .citat { padding: 80px 24px; }
 
       .om-mig { padding: 80px 24px; }
-      .om-mig-inner { grid-template-columns: 1fr; gap: 48px; }
+      .om-mig-inner { grid-template-columns: minmax(0, 1fr); gap: 48px; }
       .om-mig-right { order: -1; }
 
       .services { padding: 80px 24px; }
-      .services-top { grid-template-columns: 1fr; gap: 32px; }
-      .services-points { grid-template-columns: 1fr; }
-      .services-point { border-right: none; border-bottom: 1px solid #2a2a2a; }
+      .services-top { grid-template-columns: minmax(0, 1fr); gap: 32px; }
+      .services-points { grid-template-columns: minmax(0, 1fr); }
+      .services-point { border-right: none; border-bottom: 1px solid #2a2a2a; padding: 32px 24px; }
+      .services-point h3 { font-size: clamp(16px, 5.8vw, 20px); }
       .services-point:last-child { border-bottom: none; }
 
       .appen { padding: 80px 0; }
-      .appen-inner { grid-template-columns: 1fr; gap: 40px; }
+      .appen-inner { grid-template-columns: minmax(0, 1fr); gap: 40px; }
       .appen-tekst { padding: 0 24px; }
       /* Én telefon ad gangen med et glimt af den næste — swipe (scroll-snap) */
       .appen-skaerme {
@@ -650,17 +714,29 @@
       .appen-note { padding: 0 24px; }
 
       .vej { padding: 80px 24px; }
-      .vej-inner { grid-template-columns: 1fr; gap: 40px; }
+      .vej-inner { grid-template-columns: minmax(0, 1fr); gap: 40px; }
       .vej-foto { order: -1; }
       .vej-maal strong { font-size: 36px; }
       .spm { padding: 80px 24px; }
       .spm summary { font-size: 17px; }
 
       .kontakt { padding: 80px 24px; }
-      .kontakt-inner { grid-template-columns: 1fr; gap: 48px; }
+      .kontakt-inner { grid-template-columns: minmax(0, 1fr); gap: 48px; }
       .kontakt-right { padding: 36px 24px; }
+      .kontakt-channel { padding: 16px 14px; gap: 10px; }
+      .kontakt-channel-text { min-width: 0; }
+      .kontakt-channel-value { font-size: clamp(14px, 4.5vw, 18px); overflow-wrap: anywhere; }
 
       footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
+    }
+
+    /* Trin 5 (29.09): "Reducér bevægelse" (svimmelhed, migræne, efter hjernerystelse). ADVARSEL: hero-elementerne står med
+       gennemsigtighed 0 og bliver KUN synlige af animationen — derfor tændes de direkte her. En blank "animation: none" på alt
+       ville gøre forsiden tom. Scroll-reveal slås fra i scriptet (så står alt bare synligt). */
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .hero-eyebrow, .hero-headline, .hero-divider, .hero-body, .hero-cta, .values-strip { animation: none; opacity: 1; transform: none; }
+      .reveal, .menu-anim .nav-links, .menu-anim .nav-links.open, .menu-anim .nav-backdrop, .menu-anim .nav-backdrop.open, .nav-toggle span { transition: none; }
     }
   </style>
 </head>
@@ -669,15 +745,18 @@
   <!-- NAVIGATION -->
   <nav>
     <a href="#" class="nav-logo">RC.</a>
-    <ul class="nav-links" id="nav-links">
-      <li><a href="#metode" onclick="closeMobileNav()">Metoden</a></li>
-      <li><a href="#om-mig" onclick="closeMobileNav()">Om mig</a></li>
-      <li><a href="#services" onclick="closeMobileNav()">Services</a></li>
-      <li><a href="#kontakt" onclick="closeMobileNav()">Kontakt</a></li>
-    </ul>
-    <button class="nav-toggle" id="nav-toggle" onclick="toggleMobileNav()" aria-label="Åbn menu">
+    <!-- Trin 5 (29.09): knappen står før menuen, så Tab går knap → menupunkter (på skærmen står den stadig til højre).
+         Ingen onclick i HTML'en — sikkerhedsreglen (CSP) blokerer dem; scriptet i bunden sætter klikkene. -->
+    <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Åbn menu" aria-expanded="false" aria-controls="nav-links">
       <span></span><span></span><span></span>
     </button>
+    <div class="nav-backdrop" id="nav-backdrop"></div>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#metode">Metoden</a></li>
+      <li><a href="#om-mig">Om mig</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#kontakt">Kontakt</a></li>
+    </ul>
   </nav>
 
   <!-- HERO -->
@@ -820,10 +899,6 @@
         <div class="services-intro reveal">
           <p class="lead">Alle er forskellige. Forskellige mål, forskelligt udgangspunkt, forskelligt behov for støtte.</p>
           <p>Derfor starter vi altid med en samtale — så vi finder ud af hvad der giver mening for dig, og hvad et forløb med mig konkret indebærer.</p>
-          <span class="tagline">Skriv til mig, så tager vi en snak.</span>
-          <div class="services-cta-wrap">
-            <a href="#kontakt" class="btn-primary">Skriv til mig</a>
-          </div>
         </div>
       </div>
 
@@ -845,6 +920,11 @@
           <h3>Mindset-arbejde</h3>
           <p>Kroppen gør hvad sindet tillader. Vi arbejder med begge — det er det der holder på den lange bane.</p>
         </div>
+      </div>
+
+      <div class="services-cta-wrap reveal">
+        <span class="tagline">Skriv til mig, så tager vi en snak.</span>
+        <a href="#kontakt" class="btn-primary">Skriv til mig</a>
       </div>
     </div>
   </section>
@@ -946,7 +1026,7 @@
             </div>
             <span class="kontakt-channel-arrow">→</span>
           </a>
-          <a href="https://www.instagram.com/radichcoaching/" target="_blank" class="kontakt-channel">
+          <a href="https://www.instagram.com/radichcoaching/" target="_blank" rel="noopener" class="kontakt-channel">
             <div class="kontakt-channel-icon"></div>
             <div class="kontakt-channel-text">
               <span class="kontakt-channel-label">Instagram</span>
@@ -954,7 +1034,7 @@
             </div>
             <span class="kontakt-channel-arrow">→</span>
           </a>
-          <a href="https://www.facebook.com/profile.php?id=61579005419885" target="_blank" class="kontakt-channel">
+          <a href="https://www.facebook.com/profile.php?id=61579005419885" target="_blank" rel="noopener" class="kontakt-channel">
             <div class="kontakt-channel-icon"></div>
             <div class="kontakt-channel-text">
               <span class="kontakt-channel-label">Facebook</span>
@@ -985,19 +1065,22 @@
           <p class="sub" id="kontakt-form-sub">Jeg svarer inden for 24 timer.</p>
           <div class="form-group">
             <label for="navn">Navn</label>
-            <input type="text" id="navn" name="navn" placeholder="Dit navn" required>
+            <input type="text" id="navn" name="navn" placeholder="Dit navn" autocomplete="name" required>
           </div>
           <div class="form-group">
             <label for="email">Email</label>
-            <input type="email" id="email" name="email" placeholder="din@email.dk" required>
+            <input type="email" id="email" name="email" placeholder="din@email.dk" autocomplete="email" required>
           </div>
           <div class="form-group">
             <label for="besked">Besked</label>
             <textarea id="besked" name="besked" placeholder="Fortæl lidt om dig selv og hvad du leder efter..." required></textarea>
           </div>
+          <!-- Trin 5 (29.09): før knappen står, hvad der sker (før kom det først bagefter); under den, hvad oplysningerne bruges til -->
+          <p class="form-hjaelp">Din mail-app åbner med beskeden klar — du trykker selv send.</p>
           <button type="submit" class="form-submit">Send besked</button>
+          <p class="form-privat">Jeg bruger kun dine oplysninger til at svare dig og evt. sende dig et tilbud. Læs mere i <a href="privatlivspolitik.html">privatlivspolitikken</a>.</p>
         </form>
-        <p id="kontakt-form-status" class="kontakt-form-status" style="display:none"></p>
+        <p id="kontakt-form-status" class="kontakt-form-status" role="status" aria-live="polite"></p>
       </div>
     </div>
   </section>
@@ -1015,19 +1098,49 @@
   </footer>
 
   <script>
-    // Rune: "Ingen mobilnavigation" — nav-links forsvandt tidligere helt
-    // med display:none under 768px, ingen erstatning. Simpel hamburger-
-    // menu: toggler .open-klassen på både knap (animerer til et kryds) og
-    // selve menuen (glider ind fra højre). Lukker automatisk ved klik på
-    // et link, så man ikke selv skal lukke menuen efter navigation.
-    function toggleMobileNav() {
-      document.getElementById('nav-toggle').classList.toggle('open');
-      document.getElementById('nav-links').classList.toggle('open');
-    }
-    function closeMobileNav() {
-      document.getElementById('nav-toggle').classList.remove('open');
-      document.getElementById('nav-links').classList.remove('open');
-    }
+    // Mobilmenuen (Rune: "Ingen mobilnavigation" → hamburger). Trin 5 (29.09): glider ind over et mørkt lag, lukker ved tryk på
+    // laget, på et menupunkt og på Escape, og siden bagved står stille, mens den er åben. Klikkene sættes her — ikke med onclick
+    // i HTML'en, som sikkerhedsreglen (CSP) blokerer.
+    (function () {
+      var knap = document.getElementById('nav-toggle');
+      var menu = document.getElementById('nav-links');
+      var lag = document.getElementById('nav-backdrop');
+      if (!knap || !menu || !lag) return;
+      var animSlut;
+      function saetMenu(aaben) {
+        // Overgangen tændes kun, mens menuen åbnes/lukkes (se .menu-anim i CSS'en)
+        document.documentElement.classList.add('menu-anim');
+        clearTimeout(animSlut);
+        animSlut = setTimeout(function () { document.documentElement.classList.remove('menu-anim'); }, 300);
+        knap.classList.toggle('open', aaben);
+        menu.classList.toggle('open', aaben);
+        lag.classList.toggle('open', aaben);
+        knap.setAttribute('aria-expanded', aaben ? 'true' : 'false');
+        knap.setAttribute('aria-label', aaben ? 'Luk menu' : 'Åbn menu');
+        document.documentElement.classList.toggle('menu-aaben', aaben);
+      }
+      knap.addEventListener('click', function () { saetMenu(!menu.classList.contains('open')); });
+      lag.addEventListener('click', function () { saetMenu(false); });
+      menu.addEventListener('click', function (e) { if (e.target.closest('a')) saetMenu(false); });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && menu.classList.contains('open')) { saetMenu(false); knap.focus(); }
+      });
+      // Tabber man ud af den åbne menu (tastatur på iPad/computer), lukker den — fokus må ikke havne bag det mørke lag
+      function vedFokusUd(e) {
+        var til = e.relatedTarget;
+        if (!menu.classList.contains('open') || !til) return;
+        if (til === knap || menu.contains(til)) return;
+        saetMenu(false);
+      }
+      menu.addEventListener('focusout', vedFokusUd);
+      knap.addEventListener('focusout', vedFokusUd);
+      // Drejes/forstørres skærmen til computerbredde med menuen åben, lukkes den (ellers stod siden låst)
+      if (window.matchMedia) {
+        var bred = window.matchMedia('(min-width: 769px)');
+        var vedSkift = function () { if (bred.matches) saetMenu(false); };
+        if (bred.addEventListener) bred.addEventListener('change', vedSkift); else if (bred.addListener) bred.addListener(vedSkift);
+      }
+    })();
 
     // Nav bliver til en mørk, blurret bjælke når man har scrollet forbi
     // hero-gradienten (i stedet for kun den falmende gradient i toppen).
@@ -1041,16 +1154,15 @@
       onScroll();
     })();
 
-    // Scroll-reveal: sektionerne (Metoden, Om mig, Services, Kontakt)
-    // fader/løfter ind når de kommer i viewport, samme følelse som
-    // hero's indlæsnings-animation. Falder tilbage til bare synligt hvis
-    // browseren ikke understøtter IntersectionObserver.
+    // Scroll-reveal: sektionerne fader/løfter ind, når de kommer i billedet — samme følelse som hero's indlæsning.
+    // Trin 5 (29.09): elementerne skjules først HER (klassen reveal-klar på <html>). Uden JavaScript, uden
+    // IntersectionObserver, med "Reducér bevægelse" slået til — eller hvis scriptet fejler — står alt bare synligt.
+    // Starter lidt tidligere end før (så snart kanten er 8 % inde), så man ikke ruller gennem en tom skærm.
     (function () {
       var revealEls = document.querySelectorAll('.reveal');
-      if (!('IntersectionObserver' in window)) {
-        revealEls.forEach(function (el) { el.classList.add('is-visible'); });
-        return;
-      }
+      if (!('IntersectionObserver' in window)) return;
+      if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      document.documentElement.classList.add('reveal-klar');
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           if (entry.isIntersecting) {
@@ -1058,7 +1170,7 @@
             io.unobserve(entry.target);
           }
         });
-      }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+      }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
       revealEls.forEach(function (el) { io.observe(el); });
     })();
 
@@ -1106,9 +1218,9 @@
           + '?subject=' + encodeURIComponent(subject)
           + '&body=' + encodeURIComponent(body);
         window.location.href = mailtoUrl;
-        statusEl.textContent = 'Din mail-app åbner nu med beskeden udfyldt — tryk send der for at fuldføre.';
+        // Trin 5 (29.09): mailadressen står i kvitteringen, så ingen mister henvendelsen, hvis der ikke åbner noget
+        statusEl.textContent = 'Din mail-app åbner nu med beskeden klar — tryk send der. Åbner der ikke noget, så skriv direkte til rune@radichcoaching.dk.';
         statusEl.classList.remove('error');
-        statusEl.style.display = 'block';
       });
     })();
   </script>

@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Sikkerhedsregel (trin 5, 29.09): browseren kører kun sidens egne scripts og de godkendte undtagelser. Holdes rigtig af tests/tjek.js (tjek 11); ret med: node tests/tjek.js --ret-csp -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
 <title>Privatlivspolitik — Radich Coaching</title>
-<meta name="description" content="Sådan behandler Radich Coaching dine oplysninger. Hjemmesiden bruger ingen cookies og ingen tredjeparter — afsnittene handler om klient-appen og dit forløb.">
+<meta name="description" content="Sådan behandler Radich Coaching dine oplysninger. Hjemmesiden bruger ingen cookies — kun cookieløs statistik. De fleste afsnit handler om klient-appen og dit forløb.">
 <link rel="canonical" href="https://radichcoaching.dk/privatlivspolitik.html">
 <style>
   @font-face {
@@ -72,6 +74,7 @@
     <table>
       <tr><th>Kategori</th><th>Eksempler</th></tr>
       <tr><td>Kontaktoplysninger</td><td>Navn, e-mail, telefonnummer</td></tr>
+      <tr><td>Henvendelser</td><td>Navn, e-mail og det, du skriver, når du kontakter os via hjemmesiden eller på mail</td></tr>
       <tr><td>Aftaleoplysninger</td><td>Tilbud, dit JA og bekræftelsen, forløbstype, pris, betalingsstatus</td></tr>
       <tr><td>Trænings- og sundhedsdata</td><td>Vægt, kropsmål, Tanita-målinger, skader, træningslog, check-ins (energi, søvn, træning), kost-log, GPS-data fra træningspas, samtaler/noter fra coaching-forløbet</td></tr>
       <tr><td>Beskeder</td><td>Tekst- og videobeskeder sendt gennem app'en mellem dig og din coach</td></tr>
@@ -89,6 +92,8 @@
     <ul>
       <li>Almindelige kontaktoplysninger: databeskyttelsesforordningens art. 6, stk. 1, litra b (opfyldelse
       af aftale om coaching).</li>
+      <li>Henvendelser, før der er en aftale: art. 6, stk. 1, litra b (så vi kan svare dig og evt. sende dig et tilbud, som du
+      selv har bedt om).</li>
       <li>Sundheds- og træningsdata: art. 9, stk. 2, litra a (dit udtrykkelige samtykke).</li>
       <li>Regnskabsoplysninger: art. 6, stk. 1, litra c (bogføringsloven).</li>
     </ul>
@@ -116,6 +121,8 @@
     bruges, og i 3 måneder derefter, medmindre du beder om tidligere sletning, jf. afsnit 7.
     Tilbud, dit JA, bekræftelsen, fakturaer og betalinger er regnskabsbilag og opbevares i 5 år efter
     bogføringslovens krav.</p>
+    <p>Skriver du til os, uden at det bliver til et forløb, sletter vi din henvendelse senest 6 måneder efter vores sidste
+    kontakt.</p>
 
     <h2>7. Dine rettigheder</h2>
     <ul>
