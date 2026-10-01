@@ -4,10 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <!-- Sikkerhedsregel (trin 5, 29.09): browseren kører kun sidens egne scripts og de godkendte undtagelser. Holdes rigtig af tests/tjek.js (tjek 11); ret med: node tests/tjek.js --ret-csp -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-9reRczQjyqS3Bw5ij3R5Fj5rXbwvdlia+MBYWirh+zQ=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
 <title>Handelsbetingelser — Radich Coaching</title>
 <meta name="description" content="Handelsbetingelser for coachingforløb hos Radich Coaching: aftale, betaling, fortrydelsesret og kontakt.">
 <link rel="canonical" href="https://radichcoaching.dk/handelsbetingelser.html">
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>
   @font-face {
     font-family: 'Inter';
@@ -314,8 +316,13 @@
   </main>
   <footer>
     <a href="index.html">RC.</a>
-    <span class="footer-text">© 2026 Radich Coaching · Alle rettigheder forbeholdes</span>
+    <span class="footer-text">© <span id="aar">2026</span> Radich Coaching · Alle rettigheder forbeholdes</span>
   </footer>
+  <script>
+    // Årstallet i bunden følger med kalenderen (drift, 30.09) — ingen, der skal huske at rette det 1. januar.
+    // Uden JavaScript står 2026 (året siden gik i luften).
+    (function () { var e = document.getElementById('aar'); if (e) e.textContent = new Date().getFullYear(); })();
+  </script>
   <!-- Cookieløs statistik (trin 7, 29.09): GoatCounter tæller besøg uden cookies og uden at gemme IP-adresser — ingen
        cookie-boks. Den ENESTE tilladte hentning udefra (tests/tjek.js, TILLADTE_EKSTERNE) og beskrevet i privatlivspolitik §8. -->
   <script data-goatcounter="https://radichcoaching.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>

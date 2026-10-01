@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Sikkerhedsregel (trin 5, 29.09): browseren kører kun sidens egne scripts og de godkendte undtagelser. Holdes rigtig af tests/tjek.js (tjek 11); ret med: node tests/tjek.js --ret-csp -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-NvIEPXzNglr6mTjNhMVemH4pK6Jq7Kvebx3tWZwJYp0=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B/Uv5W5EbsP3I0Sz/kMzKIvzmtvHgmjeZaG266yrb6Y=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
   <title>Personlig træner i Lemvig og omegn — Radich Coaching</title>
   <!-- Delebillede (trin 4, 29.09): når siden deles i Messenger/Facebook/sms, vises billeder/delebillede.jpg (1200x630) med
        Rune og hero-sætningen. Muligt nu, fordi billederne er pakket ud af HTML-filen (før: data:-URI uden adresse). -->
@@ -29,7 +29,10 @@
   <meta name="twitter:image" content="https://radichcoaching.dk/billeder/delebillede.jpg">
   <meta name="twitter:title" content="Personlig træner i Lemvig og omegn — Radich Coaching">
   <meta name="twitter:description" content="Personlig træner i Lemvig og omegn. Ingen skabeloner, ingen pakkeløsninger.">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230C0C0C'/%3E%3Ctext x='32' y='44' font-family='Arial, sans-serif' font-weight='900' font-size='30' fill='%23C4F501' text-anchor='middle'%3ERC%3C/text%3E%3C/svg%3E">
+  <!-- Ikoner (drift, 30.09): "RC." i sidens egen skrift og farver (kilder/lav-ikoner.py). favicon.ico ligger i roden, så Google og
+       alle browsere finder den; iPhone bruger apple-touch-icon.png, når siden lægges på hjemmeskærmen. -->
+  <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <!-- Faktaboks til Google (JSON-LD, 2026-09-22): firmanavn, CVR, hvor der coaches og profilerne.
        Den vises ikke på siden — den fortæller kun søgemaskinerne hvem virksomheden er.
        Vejnavnet står ikke her, kun by og postnummer. BEMÆRK (efterprøvningen 2026-09-22): den fulde adresse
@@ -1094,7 +1097,7 @@
       <a href="handelsbetingelser.html">Handelsbetingelser</a>
       <a href="privatlivspolitik.html">Privatlivspolitik</a>
     </span>
-    <span class="footer-text">© 2026 Radich Coaching · CVR 45834786 · Lemvig-området</span>
+    <span class="footer-text">© <span id="aar">2026</span> Radich Coaching · CVR 45834786 · Lemvig-området</span>
   </footer>
 
   <script>
@@ -1185,6 +1188,10 @@
       else if (dage === 1) { el.textContent = '1'; txt.textContent = 'dag til start i Frankfurt'; }
       else if (dage === 0) { el.textContent = 'I dag'; txt.textContent = 'Strong Viking Frankfurt'; }
     })();
+
+    // Årstallet i bunden følger med kalenderen (drift, 30.09) — ingen, der skal huske at rette det 1. januar.
+    // Uden JavaScript står 2026 (året siden gik i luften).
+    (function () { var e = document.getElementById('aar'); if (e) e.textContent = new Date().getFullYear(); })();
 
     // "Skriv til mig" (trin 2, 29.09 — "one touch"): på en telefon åbner knapperne mailen direkte med emnet udfyldt (1 tryk i
     // stedet for rul + 3 felter + send). På en computer — og uden JavaScript — fører de stadig ned til Kontakt (formularen og
