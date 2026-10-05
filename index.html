@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Sikkerhedsregel (trin 5, 29.09): browseren kører kun sidens egne scripts og de godkendte undtagelser. Holdes rigtig af tests/tjek.js (tjek 11); ret med: node tests/tjek.js --ret-csp -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fxI/OMwIDZHWroIWGvdkj/9nVGsJSYZ2D4f6dNLWM1Q=' 'sha256-38SwHPiFnQ8yUKc71lUQ1i01lpCd8Clh+cXI9NYlxm0=' 'sha256-ptumz0ZS0JVP0Ee2v0AYN1x9Fiiq+yDzStmE02DAZC4=' 'sha256-df7Ssdh8kL9IOE4nEi0QvJ13TkmXm69eC6prEqNTYF8=' 'sha256-9reRczQjyqS3Bw5ij3R5Fj5rXbwvdlia+MBYWirh+zQ=' 'sha256-nTbjA6iJlBF89CZ5RebwalyCc0kct2mEOndZ5HDHAJE=' 'sha256-K3Ntd9BnffYa/ndSFSty+77yFmMfuzu5LAqkwDrjnQI=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fxI/OMwIDZHWroIWGvdkj/9nVGsJSYZ2D4f6dNLWM1Q=' 'sha256-38SwHPiFnQ8yUKc71lUQ1i01lpCd8Clh+cXI9NYlxm0=' 'sha256-ptumz0ZS0JVP0Ee2v0AYN1x9Fiiq+yDzStmE02DAZC4=' 'sha256-df7Ssdh8kL9IOE4nEi0QvJ13TkmXm69eC6prEqNTYF8=' 'sha256-9reRczQjyqS3Bw5ij3R5Fj5rXbwvdlia+MBYWirh+zQ=' 'sha256-F4OZo2GvVzlqp2MRvqpcuc4B5HX/o2RONTMBgrnZRIA=' 'sha256-nTbjA6iJlBF89CZ5RebwalyCc0kct2mEOndZ5HDHAJE=' 'sha256-K3Ntd9BnffYa/ndSFSty+77yFmMfuzu5LAqkwDrjnQI=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
   <title>Personlig træner i Lemvig og omegn — Radich Coaching</title>
   <!-- Delebillede (trin 4, 29.09): når siden deles i Messenger/Facebook/sms, vises billeder/delebillede.jpg (1200x630) med
        Rune og hero-sætningen. Muligt nu, fordi billederne er pakket ud af HTML-filen (før: data:-URI uden adresse). -->
@@ -1395,8 +1395,22 @@
     // Uden JavaScript står 2026 (året siden gik i luften).
     (function () { var e = document.getElementById('aar'); if (e) e.textContent = new Date().getFullYear(); })();
   </script>
-  <!-- Mailto-omskrivningen af "Skriv til mig" er FJERNET (etape 3, 05.10): knapperne fører til #kontakt på ALLE enheder, hvor Ring, SMS, Instagram og
-       mailadressen står. Før åbnede de en mail på en telefon — og et mailto-link kan gøre ingenting i en indbygget browser uden mailprogram. -->
+  <script>
+    // "Skriv til mig" (trin 2, 29.09 — "one touch"; GENINDFØRT 05.10 efter Runes ønske "Skriv til mig skal bare være mail"): på en telefon (kun berøringsskærm
+    // uden mus) åbner heroens og Services' knap mailen direkte med emnet udfyldt (1 tryk). På en computer — og uden JavaScript — fører de stadig til Kontakt
+    // (formularen, mailadressen, Ring/SMS, Instagram), fordi et mail-link intet gør uden mailprogram. Kontakt-blokken er stadig ét tryk væk i menuen, så en
+    // telefon uden mailkonto (eller en indbygget browser, der ikke åbner mail) ikke er en blindgyde. Ingen data forlader telefonen. LÅST: tjek 6 kræver
+    // touch-vagten (matchMedia) — uden den ville computeren få et mail-link, der intet gør.
+    (function () {
+      if (!window.matchMedia || !window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
+      var mail = 'mailto:rune@radichcoaching.dk'
+        + '?subject=' + encodeURIComponent('Lad os tage en snak')
+        + '&body=' + encodeURIComponent('Hej Rune\n\nKort om mig, og hvad jeg gerne vil:\n\n');
+      Array.prototype.forEach.call(document.querySelectorAll('a.btn-primary[href="#kontakt"]'), function (a) {
+        a.setAttribute('href', mail);
+      });
+    })();
+  </script>
   <script>
     // Tilgængelighed (05.10): rækken af app-skærme kan kun rulles under 769 px (swipe) — der er tabindex="0" et rigtigt tab-stop. På computer er der
     // intet at rulle, og tab-stoppet fører ingen steder hen, så det tages af dér (og sættes igen, hvis vinduet gøres smalt). Uden JavaScript
