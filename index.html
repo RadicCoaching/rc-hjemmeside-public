@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- Sikkerhedsregel (trin 5, 29.09): browseren kører kun sidens egne scripts og de godkendte undtagelser. Holdes rigtig af tests/tjek.js (tjek 11); ret med: node tests/tjek.js --ret-csp -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-B/Uv5W5EbsP3I0Sz/kMzKIvzmtvHgmjeZaG266yrb6Y=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' data: https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-fxI/OMwIDZHWroIWGvdkj/9nVGsJSYZ2D4f6dNLWM1Q=' 'sha256-38SwHPiFnQ8yUKc71lUQ1i01lpCd8Clh+cXI9NYlxm0=' 'sha256-ptumz0ZS0JVP0Ee2v0AYN1x9Fiiq+yDzStmE02DAZC4=' 'sha256-df7Ssdh8kL9IOE4nEi0QvJ13TkmXm69eC6prEqNTYF8=' 'sha256-9reRczQjyqS3Bw5ij3R5Fj5rXbwvdlia+MBYWirh+zQ=' 'sha256-nTbjA6iJlBF89CZ5RebwalyCc0kct2mEOndZ5HDHAJE=' 'sha256-K3Ntd9BnffYa/ndSFSty+77yFmMfuzu5LAqkwDrjnQI=' https://gc.zgo.at/count.js; style-src 'unsafe-inline'; img-src 'self' https://radichcoaching.goatcounter.com/count; font-src 'self'; connect-src https://radichcoaching.goatcounter.com/count; base-uri 'none'; form-action 'none'">
   <title>Personlig træner i Lemvig og omegn — Radich Coaching</title>
   <!-- Delebillede (trin 4, 29.09): når siden deles i Messenger/Facebook/sms, vises billeder/delebillede.jpg (1200x630) med
        Rune og hero-sætningen. Muligt nu, fordi billederne er pakket ud af HTML-filen (før: data:-URI uden adresse). -->
@@ -50,6 +50,7 @@
     "description": "Personlig træner og coach i Lemvig og omegn. Træning, mindset og ansvarlighed i ét forløb. Coaching efter aftale.",
     "url": "https://radichcoaching.dk/",
     "email": "rune@radichcoaching.dk",
+    "telephone": "+4529898704",
     "identifier": { "@type": "PropertyValue", "propertyID": "CVR", "value": "45834786" },
     "founder": { "@type": "Person", "name": "Rune Radich" },
     "address": { "@type": "PostalAddress", "addressLocality": "Harboøre", "postalCode": "7673", "addressCountry": "DK" },
@@ -83,6 +84,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
+      /* ── HERO-FOTOETS DÆMPNING (etape 2b, 05.10) ──
+         ÉN værdi at skifte: --hero-daemp.   0 = GRAD 2 "let dæmpet" (aktiv nu)   1 = GRAD 1 "kraftigt dæmpet".
+         GRAD 2: Runes ansigt tydeligt, resten af fotoet mørkere og mere afdæmpet end før; de tilfældige personer står i skygge uden detaljer.
+         GRAD 1: omtrent som den gamle hero i lysstyrke — Runes ansigt kun lige synligt (form og blikretning ses), de fremmede er ikke genkendelige.
+         Mellemværdier (fx 0.5) er en grad midt imellem. Virker kun på den delte hero på computer (fra 1024 px) og på telefon-heroen (højst 600 px);
+         tablets (601-1023 px) og det stående computervindue har den gamle hero og røres ikke.
+         De tre afledte tal er mørkets styrke (0 = ingen, 1 = sort) ved Runes ansigt, i fotoets øvrige dele og ved de fremmede. */
+      --hero-daemp: 0;
+      --hero-m-ansigt: calc(0.20 + 0.49 * var(--hero-daemp));
+      --hero-m-omegn: calc(0.52 + 0.34 * var(--hero-daemp));
+      --hero-m-fremmede: calc(0.95 + 0.04 * var(--hero-daemp));
       /* Canvas black — deepest layer. Not an official brand swatch (the brand
          file's darkest black is Vintage Black #1F1F1F), kept as an unofficial
          derived shade so the site retains a true-black base beneath it. */
@@ -185,6 +197,20 @@
        gule knapper, hvor en gul ring ville forsvinde. */
     a:focus-visible, button:focus-visible, summary:focus-visible, [tabindex]:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
     .btn-primary:focus-visible, .form-submit:focus-visible { outline-color: var(--white); }
+    /* "Spring til indhold" (tilgængelighed, 05.10): første stop for tastaturet, så man slipper for logo og menu. Skjult for øjet,
+       indtil tastaturet står på det — musen og fingeren ser det aldrig. main har tabindex="-1" (kun som mål, ikke et tab-stop). */
+    .spring-til-indhold {
+      position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+      overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+    }
+    .spring-til-indhold:focus, .spring-til-indhold:focus-visible {
+      position: fixed; top: 12px; left: 12px; z-index: 400; width: auto; height: auto; margin: 0; padding: 14px 22px;
+      overflow: visible; clip: auto; clip-path: none;
+      background: var(--accent); color: var(--black); text-decoration: none;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+      outline: 2px solid var(--white); outline-offset: 3px;
+    }
+    main[tabindex="-1"]:focus { outline: none; }
     .nav-backdrop { display: none; }
 
     /* Trin 5 (29.09): et menuklik lander altid med luft under menubjælken (før: tilfældigt 5 px bag den på mobil) */
@@ -271,15 +297,47 @@
       letter-spacing: 0.12em; text-transform: uppercase; color: var(--lightgray);
     }
 
+    /* ── HERO PÅ COMPUTER: delt layout (etape 2, N1-01) ── Tekst til venstre på sort, Runes foto til højre med blød indtoning.
+       Før lå fotoet bag hele teksten: overskriften løb hen over hans pande, og "Skriv til mig" lå under skærmkanten på bærbare
+       (knap-bund 874 px). Overskriften følger nu også skærmens HØJDE, så knappen altid er med. Samme foto, tekst, farver og skrift.
+       Kun fra 1024 px i bredden OG et liggende vindue (bredden mindst 5/4 af højden): på et smalt eller stående vindue er fotoets
+       boks for smal til hele ansigtet (målt: ved 800x600 og 820x1180 var ansigtet skåret af). Alt andet beholder den gamle hero (fuld baggrund). */
+    @media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+      .hero { background-image: none; background-color: var(--black); padding-top: clamp(100px, 12vh, 132px); }
+      .hero::before {
+        content: ''; position: absolute; top: 0; bottom: 0; right: 0; width: 56%;
+        background: url('billeder/hero.webp') 33% 18% / cover no-repeat;
+        -webkit-mask-image: linear-gradient(to right, transparent 0, transparent 8%, rgba(0,0,0,0.04) 14%, rgba(0,0,0,0.14) 20%, rgba(0,0,0,0.3) 26%, rgba(0,0,0,0.52) 32%, rgba(0,0,0,0.76) 38%, rgba(0,0,0,0.92) 43%, #000 48%);
+                mask-image: linear-gradient(to right, transparent 0, transparent 8%, rgba(0,0,0,0.04) 14%, rgba(0,0,0,0.14) 20%, rgba(0,0,0,0.3) 26%, rgba(0,0,0,0.52) 32%, rgba(0,0,0,0.76) 38%, rgba(0,0,0,0.92) 43%, #000 48%);
+      }
+      .hero-overlay {
+        background:
+          linear-gradient(to bottom, rgba(12,12,12,0.75) 0, rgba(12,12,12,0.4) 10%, rgba(12,12,12,0) 22%),
+          linear-gradient(to top, rgba(12,12,12,0.95) 0, rgba(12,12,12,0.7) 22%, rgba(12,12,12,0) 48%);
+      }
+      .hero-headline { font-size: clamp(56px, min(6.6vw, 11.5vh), 112px); margin-bottom: 28px; }
+      .hero-eyebrow { margin-bottom: 18px; }
+      .hero-divider { margin-bottom: 24px; }
+      .hero-body { max-width: min(700px, calc(56vw - 48px)); }
+      .hero-body p { margin-bottom: 12px; }
+      .hero-tagline { margin-top: 22px; }
+      .hero-cta { margin-top: 32px; }
+      .values-strip { margin-top: 56px; }
+    }
+
     /* ── FÆLLES ── */
     section { border-top: 1px solid #1a1a1a; }
     .section-label {
       font-size: 11px; font-weight: 600; letter-spacing: 0.22em; text-transform: uppercase;
       color: var(--accent); margin-bottom: 20px; display: block;
     }
+    /* Linjehøjde 1,05 (etape 2, N1-05; før 0,95): æ, ø, å og é stikker 0,2 em op over versalerne og ramte linjen over — accenten i "ÉT"
+       skar ned i "TRE", ringen i "PÅ" rørte "JEG STÅR SELV". Målt pixel for pixel (frihøjde mellem to linjer, i em): ved 0,95 er den
+       -0,05 (PÅ), 0,005 (TRE/ÉT) og 0,015 (SPØRGER OM); ved 1,05 er den 0,05, 0,105 og 0,115. Hero-overskriften (0,92) har ingen
+       accenttegn og røres ikke. */
     .section-headline {
       font-family: 'Inter', sans-serif; font-weight: 900;
-      text-transform: uppercase; line-height: 0.95; letter-spacing: -0.03em; color: var(--white);
+      text-transform: uppercase; line-height: 1.05; letter-spacing: -0.03em; color: var(--white);
     }
 
     /* ── CITAT ── */
@@ -528,6 +586,39 @@
     .kontakt-channel-arrow { color: var(--lightgray); font-size: 18px; transition: color 0.2s; }
     .kontakt-channel:hover .kontakt-channel-arrow { color: var(--accent); }
 
+    /* ── KONTAKTVEJ (etape 3, 05.10) ── Ring, SMS og Instagram-besked øverst: almindelige links (tel:, sms:, https), der virker i Instagrams og
+       Facebooks indbyggede browser og uden mailprogram. Svar-løftet står lige ved knapperne (og ved formularen). Knapperne er sidens egen
+       .btn-primary (ingen ny farve eller knapstil); begge er mindst 44 px høje. Intet script. */
+    .kontakt-hurtig { margin: 8px 0 40px; }
+    .kontakt-knapper { display: flex; gap: 12px; }
+    .kontakt-knapper .btn-primary { flex: 1 1 0; min-width: 0; max-width: 200px; text-align: center; padding: 18px 12px; }
+    /* Computer (mus, ingen berøring): tel:/sms: gør som regel intet uden telefonprogram — dér står nummeret som tekst, og formularen er hovedvejen
+       (Rune 05.10). Ren CSS: knapperne står stadig i HTML'en (telefon og tablet). LÅST: tjek 6 kræver reglen. */
+    @media (hover: hover) and (pointer: fine) { .kontakt-knapper { display: none; } }
+    .kontakt-left p.kontakt-nummer {
+      color: var(--white); font-weight: 900; font-size: clamp(26px, 8vw, 34px); line-height: 1.15; letter-spacing: -0.01em;
+      margin: 24px 0 4px; font-variant-numeric: tabular-nums;
+      -webkit-user-select: all; user-select: all; /* ét tryk/klik markerer hele nummeret, så det kan kopieres */
+    }
+    .kontakt-left p.kontakt-svar { color: var(--lightgray); font-size: 0.9375rem; line-height: 1.6; margin-bottom: 4px; }
+    .kontakt-ig {
+      display: inline-flex; align-items: center; gap: 8px; min-height: 44px;
+      color: var(--accent); font-weight: 700; font-size: 1rem;
+      text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s;
+    }
+    .kontakt-ig:hover { color: var(--white); }
+    /* Mailadressen som TEKST, man kan kopiere (ét tryk markerer hele adressen), med "åbn din mail-app" som almindeligt link. Rækken er ikke
+       et link i sig selv (så teksten kan markeres) — derfor ingen hover-effekt som på de andre kanaler. */
+    .kontakt-channel-mail:hover { border-color: #2a2a2a; background: none; transform: none; }
+    .kontakt-channel-mail:hover .kontakt-channel-icon { box-shadow: none; }
+    .kontakt-mailtekst { -webkit-user-select: all; user-select: all; }
+    .kontakt-kopi { display: block; margin-top: 2px; color: var(--lightgray); font-size: 13px; line-height: 1.5; }
+    .kontakt-kopi a {
+      display: inline-block; padding: 12.25px 0; margin: -12.25px 0; /* trykfladen er mindst 44 px høj (19,5 px linje + 2 × 12,25), uden at rækken bliver højere */
+      color: var(--accent); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; white-space: nowrap;
+    }
+    .kontakt-kopi a:hover { color: var(--white); }
+
     .kontakt-right {
       border: 1px solid #2a2a2a; padding: 56px 48px;
       background: var(--black);
@@ -620,16 +711,6 @@
     .reveal-stagger > .reveal:nth-child(2) { transition-delay: 0.12s; }
     .reveal-stagger > .reveal:nth-child(3) { transition-delay: 0.24s; }
 
-    /* Meget diskret filmkorn på hele siden for en mere "tactile"/premium
-       overflade — respekterer klik (pointer-events:none), ingen ekstra
-       billed-filer (ren SVG-støj som data-URI). */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 300; pointer-events: none;
-      opacity: 0.025; mix-blend-mode: overlay;
-      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-    }
-
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       nav { padding: 20px 24px; }
@@ -670,6 +751,10 @@
       .hero-headline .accent-word { display: inline; }
       .hero-headline .br-mobil { display: inline; }
       .hero-headline .br-desktop { display: none; }
+      /* Tilgængelighed (05.10): når "det dyreste" står på samme linje, tabte Chromes tilgængelighedstræ mellemrummet efter den skjulte <br>
+         og læste overskriften som "FORTRYDELSE ERDET DYRESTE". Tomt indhold med et mellemrum som alternativtekst (content: "" / " ")
+         giver skærmlæseren sit mellemrum, uden at noget tegnes eller flytter sig. Kender browseren ikke syntaksen, springes linjen over. */
+      .hero-headline .accent-word::before { content: "" / " "; }
       /* Lodret mørkt lag på mobil: teksten fylder hele bredden, så det vandrette lag efterlod afsnit 2 med 1,9:1 kontrast */
       .hero-overlay { background: linear-gradient(to bottom, rgba(12,12,12,0.85) 0%, rgba(12,12,12,0.70) 100%); }
       .hero-body p { font-size: 1rem; }
@@ -733,6 +818,52 @@
       footer { padding: 24px; flex-direction: column; gap: 8px; text-align: center; }
     }
 
+    /* ── HERO PÅ TELEFON: foto nederst (etape 2, N1-02) ── Teksten står på sort øverst, Runes ansigt nederst ved siden af knappen.
+       Før lå fotoet bag al teksten under et mørkt lag (kun en sløret skygge af et ansigt). Laget er helt mørkt bag teksten og åbner
+       først under knappen (lodret: teksten fylder hele bredden). Skrift og knap er uændrede. Kun på telefon (højst 600 px): på en
+       lille tablet (fra ca. 700 px) står teksten længere nede, så laget ville ikke være mørkt nok bag den (målt 3,9-4,1:1) — dér
+       står den gamle hero ovenfor (vandret fotolag + mørkt lag), som før. */
+    @media (max-width: 600px) {
+      .hero { background-color: var(--black); background-size: auto 60%; background-position: 34% 100%; }
+      .hero-overlay {
+        background: linear-gradient(to bottom, rgba(12,12,12,1) 0, rgba(12,12,12,0.97) 50%, rgba(12,12,12,0.55) 62%,
+                    rgba(12,12,12,0.08) 74%, rgba(12,12,12,0.8) 80%, rgba(12,12,12,0.94) 86%, rgba(12,12,12,0.96) 100%);
+      }
+    }
+    /* ── HERO-FOTOETS DÆMPNING (etape 2b, 05.10) ── Runes ønske: han skal stå "en anelse i baggrunden", og de tilfældige personer i fotoet (manden
+       bag skulderen, kvinden nederst til højre, børnene til venstre) må ikke kunne ses tydeligt. Graden skiftes med --hero-daemp øverst i :root.
+       Et mørkt lag (samme farve som siden, så det er usynligt på den sorte baggrund) ligger over fotoet og har fotoets EGNE mål: en boks med
+       fotoets højde-bredde-forhold (1400:933), placeret nøjagtigt som fotoet (computer: 33 % ind i boksen på 56 % af bredden; telefon: 34 % hen,
+       nederst, 60 % højt). Derfor sidder mørket de samme steder i fotoet ved enhver skærmstørrelse. Fra fotoets egne punkter: lyst om Runes hoved
+       (midt 51 % / 39 %), mørkere jo længere væk, helt mørkt hvor de fremmede står (højre side og nederst til venstre). Ingen nyt billede. */
+    @media (min-width: 1024px) and (min-aspect-ratio: 5/4), (max-width: 600px) {
+      .hero-overlay::before {
+        content: ''; position: absolute; aspect-ratio: 1400 / 933; pointer-events: none;
+        background:
+          radial-gradient(ellipse 30% 52% at 84% 76%, rgba(12,12,12,var(--hero-m-fremmede)) 0, rgba(12,12,12,var(--hero-m-fremmede)) 70%, rgba(12,12,12,0) 114%),
+          radial-gradient(ellipse 22% 32% at 9% 72%, rgba(12,12,12,var(--hero-m-fremmede)) 0, rgba(12,12,12,var(--hero-m-fremmede)) 55%, rgba(12,12,12,0) 108%),
+          radial-gradient(ellipse 26% 42% at 51.1% 39.4%, rgba(12,12,12,var(--hero-m-ansigt)) 0, rgba(12,12,12,var(--hero-m-ansigt)) 50%, rgba(12,12,12,var(--hero-m-omegn)) 100%);
+      }
+    }
+    @media (min-width: 1024px) and (min-aspect-ratio: 5/4) {
+      .hero-overlay::before { top: 0; height: 100%; left: 62.48%; transform: translateX(-33%); }
+    }
+    /* Meget brede vinduer (over 2,68 gange højden, fx 3440 px bred skærm med lavt vindue): fotoets boks er så bred, at fotoet fylder boksens BREDDE
+       (ikke højden) og beskæres lodret (18 % fra toppen). Laget følger med: boksens bredde, 18 % ind fra toppen. */
+    @media (min-width: 2200px) and (min-aspect-ratio: 268/100) {
+      .hero-overlay::before { top: 18%; height: auto; left: 44%; width: 56%; transform: translateY(-18%); }
+    }
+    @media (max-width: 600px) {
+      /* På telefon ligger fotoet allerede under et lodret lag, der er mørkt bag teksten og åbent ved ansigtet: ansigtets mørke er derfor lidt lavere her. */
+      :root { --hero-m-ansigt: calc(0.08 + 0.44 * var(--hero-daemp)); }
+      .hero-overlay::before { bottom: 0; height: 60%; left: 34%; transform: translateX(-34%); }
+    }
+    /* Kontrol (05.10): på små tablets (601-1023 px) lå brødteksten under 4,5:1 mod fotoet. Et jævnt, lidt mørkere lag over hele heroen løfter
+       kontrasten; fotoet bliver her en dæmpet baggrund som før (den delte hero begynder først ved 1024 px, telefon-heroen slutter ved 600 px). */
+    @media (min-width: 601px) and (max-width: 1023px) {
+      .hero-overlay { background: linear-gradient(to bottom, rgba(12,12,12,0.9) 0%, rgba(12,12,12,0.84) 100%); }
+    }
+
     /* Trin 5 (29.09): "Reducér bevægelse" (svimmelhed, migræne, efter hjernerystelse). ADVARSEL: hero-elementerne står med
        gennemsigtighed 0 og bliver KUN synlige af animationen — derfor tændes de direkte her. En blank "animation: none" på alt
        ville gøre forsiden tom. Scroll-reveal slås fra i scriptet (så står alt bare synligt). */
@@ -741,13 +872,54 @@
       .hero-eyebrow, .hero-headline, .hero-divider, .hero-body, .hero-cta, .values-strip { animation: none; opacity: 1; transform: none; }
       .reveal, .menu-anim .nav-links, .menu-anim .nav-links.open, .menu-anim .nav-backdrop, .menu-anim .nav-backdrop.open, .nav-toggle span { transition: none; }
     }
+
+    /* ── PRINT og "Gem som PDF" (05.10, N1-13) ── Før: hvid tekst på hvidt papir (browseren printer ikke baggrunde) og 13 sider.
+       Nu: sort tekst på hvidt, uden topbjælke, formular, knapper, telefonskærme og billeder, og spørgsmålenes svar er slået ud.
+       Rører kun print — intet på skærmen. */
+    @media print {
+      @page { margin: 14mm; }
+      html { font-size: 14px; }
+      html, body { background: #fff !important; }
+      *, *::before, *::after {
+        color: #111 !important; background: transparent !important; box-shadow: none !important; text-shadow: none !important;
+        border-color: #bbb !important; opacity: 1 !important; transform: none !important; animation: none !important; transition: none !important;
+      }
+      nav, .nav-backdrop, .hero-overlay, .hero::before, .hero::after, .hero-divider, .hero-cta, .values-strip, .metode-num, .metode-accent-line,
+      .services-point-icon, .services-cta-wrap .btn-primary, .appen-skaerme, .appen-note, .vej-foto, .om-mig-right, .kontakt-right,
+      .kontakt-channel-arrow, .kontakt-channel-icon, .spm summary::after, .kontakt-knapper, .kontakt-ig, .kontakt-kopi { display: none !important; }
+      .kontakt-hurtig { margin: 4mm 0 6mm !important; }
+      .kontakt-left p.kontakt-nummer { font-size: 16pt !important; margin: 0 0 1mm !important; }
+      .hero { min-height: 0 !important; padding: 0 0 8mm !important; overflow: visible; }
+      .hero-headline { font-size: 34pt !important; margin-bottom: 6mm !important; }
+      section { padding: 7mm 0 !important; }
+      .metode-header { margin-bottom: 6mm !important; }
+      .metode-header .section-headline, .om-mig-left .section-headline, .services-top .section-headline, .appen-tekst .section-headline,
+      .vej-tekst .section-headline, .spm .section-headline, .kontakt-left .section-headline { font-size: 24pt !important; margin-bottom: 5mm !important; }
+      .metode-card, .services-point { padding: 5mm 4mm !important; }
+      .metode-card h3, .services-point h3 { font-size: 13pt !important; }
+      .om-mig-inner, .vej-inner, .appen-inner, .services-top, .kontakt-inner { display: block !important; }
+      .services-top { margin-bottom: 6mm !important; }
+      .services-divider { display: none; }
+      .kontakt-channels { margin-top: 6mm !important; }
+      .kontakt-channel { padding: 3mm 4mm !important; }
+      .citat { padding: 7mm 0 !important; }
+      footer { padding: 6mm 0 0 !important; }
+      .metode-grid, .services-points, .kontakt-channels, .metode-card, .services-point, .kontakt-channel, .vej-maal, .spm details, .kontakt-trin li, h2, h3, summary { break-inside: avoid; }
+      h2, h3, .section-label, summary { break-after: avoid; }
+      a { text-decoration: none; }
+    }
+    /* Egen regel: ældre browsere kender ikke ::details-content, og en ukendt vælger ville ellers ugyldiggøre hele reglen ovenfor */
+    @media print { details::details-content { content-visibility: visible; display: block; } }
   </style>
 </head>
 <body>
 
+  <!-- Tilgængelighed (05.10): "Spring til indhold" er skjult for øjet og kommer kun frem, når tastaturet står på det (CSS ved .spring-til-indhold) -->
+  <a href="#indhold" class="spring-til-indhold">Spring til indhold</a>
+
   <!-- NAVIGATION -->
-  <nav>
-    <a href="#" class="nav-logo">RC.</a>
+  <nav aria-label="Hovedmenu">
+    <a href="#" class="nav-logo" aria-label="RC – Radich Coaching, til toppen">RC.</a>
     <!-- Trin 5 (29.09): knappen står før menuen, så Tab går knap → menupunkter (på skærmen står den stadig til højre).
          Ingen onclick i HTML'en — sikkerhedsreglen (CSP) blokerer dem; scriptet i bunden sætter klikkene. -->
     <button class="nav-toggle" id="nav-toggle" type="button" aria-label="Åbn menu" aria-expanded="false" aria-controls="nav-links">
@@ -763,7 +935,7 @@
   </nav>
 
   <!-- HERO -->
-  <main>
+  <main id="indhold" tabindex="-1">
   <section class="hero" id="hero">
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -804,22 +976,22 @@
       </div>
       <div class="metode-grid reveal-stagger">
         <div class="metode-card reveal">
-          <span class="metode-num">01</span>
+          <span class="metode-num" aria-hidden="true">01</span>
           <div class="metode-accent-line"></div>
           <h3><span>Kroppen</span></h3>
           <p>Træning der passer til dig — ikke en skabelon. Vi bygger styrke og kapacitet på en måde du faktisk kan holde til, og som giver resultater du kan mærke.</p>
         </div>
         <div class="metode-card reveal">
-          <span class="metode-num">02</span>
+          <span class="metode-num" aria-hidden="true">02</span>
           <div class="metode-accent-line"></div>
           <h3><span>Sindet</span></h3>
           <p>Iron Mindset er ikke et slogan. Det er en praksis. Vi arbejder med de mønstre og overbevisninger der holder dig fast — og erstatter dem med noget der bærer.</p>
         </div>
         <div class="metode-card reveal">
-          <span class="metode-num">03</span>
+          <span class="metode-num" aria-hidden="true">03</span>
           <div class="metode-accent-line"></div>
           <h3><span>Ansvarlighed</span></h3>
-          <p>"Vis mig din træning" er ikke kontrol — det er støtte. Du ved at der er nogen der holder øje. Det gør en forskel, når det er svært.</p>
+          <p>"Vis mig din træning" er ikke kontrol — det er støtte. Er det aftalt, ved du, at jeg følger med. Det gør en forskel, når det er svært.</p>
         </div>
       </div>
     </div>
@@ -847,7 +1019,7 @@
           <p>Mit vendepunkt kom da ryggen sagde fra. Læger fortalte mig, jeg måske aldrig ville løfte tungt igen. Aldrig løbe. Aldrig træne OCR.</p>
           <p>Det der ramte hårdest var noget andet: tanken om ikke at kunne løfte mine børn.</p>
           <p>Jeg valgte at kæmpe mig igennem det. Ikke hurtigt. Ikke perfekt. Men igennem.</p>
-          <p>Den rejse lærte mig, at fremskridt ikke handler om aldrig at falde. Det handler om at rejse sig igen — og at have nogen der holder øje med, at du gør det.</p>
+          <p>Den rejse lærte mig, at fremskridt ikke handler om aldrig at falde. Det handler om at rejse sig igen — og at have nogen i sit hjørne, når man gør det.</p>
           <p>I dag kan jeg dødløfte igen. Jeg løber OCR. Jeg kan løfte mine børn.</p>
           <p>Og jeg bruger alt det, jeg er — fejlene, kampene, vejen tilbage — i mit arbejde som coach.</p>
           <p>Igen og igen ser jeg mennesker finde styrke og overskud de havde glemt var der — med små skridt der faktisk holder.</p>
@@ -877,7 +1049,7 @@
         <h2 class="section-headline">Jeg står selv<br>på startlinjen.</h2>
         <p class="lead">Næste mål: Strong Viking Frankfurt, 3. juli 2027. Forhindringer, mudder og bakker — og 12 måneders træning, der skal holde hele vejen.</p>
         <p>Jeg træner efter samme metode og i den samme app, som mine klienter bruger. Jeg ved, hvad det kræver at møde op — også de dage, hvor alt i en siger nej.</p>
-        <p class="vej-maal" aria-live="polite"><strong id="vej-dage">3. juli 2027</strong><span id="vej-tekst">Frankfurt</span></p>
+        <p class="vej-maal"><strong id="vej-dage">3. juli 2027</strong><span id="vej-tekst">Frankfurt</span></p>
       </div>
       <figure class="vej-foto reveal">
         <img src="billeder/strong-viking.webp" width="800" height="1000" loading="lazy" decoding="async" alt="Rune Radich, mudret og smilende med knyttet hånd efter en forhindring ved Strong Viking">
@@ -939,19 +1111,19 @@
       <div class="appen-tekst reveal">
         <span class="section-label">Appen</span>
         <h2 class="section-headline">Din træning.<br>I lommen.</h2>
-        <p class="lead">Det, vi aftaler, samles i din egen app. Dit program, dine tal og mig — ét sted.</p>
+        <p class="lead">Er appen en del af dit forløb, samles det, vi aftaler, i din egen app. Dit program, dine tal og mig — ét sted.</p>
         <p class="appen-intro">Appen kan blandt andet:</p>
         <ul class="appen-liste">
           <li>Vise dit program uge for uge, med dagens vægt og tal</li>
           <li>Fejre dine rekorder automatisk, når du slår dem</li>
           <li>Holde styr på dine ugemål</li>
-          <li>Tage imod en video af din træning, så jeg kan give dig feedback</li>
+          <li>Sende en video af din træning til mig, når vi har aftalt feedback</li>
           <li>Føre kostlog med billeder</li>
         </ul>
-        <p class="appen-aftale">Hvad dit forløb indeholder, aftaler vi til forsamtalen — ud fra det, du har brug for.</p>
+        <p class="appen-aftale">Om appen er med, og hvad dit forløb ellers indeholder, aftaler vi til forsamtalen — ud fra det, du har brug for.</p>
       </div>
       <div class="reveal">
-        <div class="appen-skaerme" tabindex="0" aria-label="Skærmbilleder fra appen — swipe for at se flere">
+        <div class="appen-skaerme" tabindex="0" role="group" aria-label="Skærmbilleder fra appen — swipe for at se flere">
           <figure class="appen-skaerm">
             <div class="telefon"><img src="billeder/app-1-program.webp" width="600" height="1220" loading="lazy" decoding="async" alt="Appen: Lang tur — uge 1 af 8, 10 km, og næste uge 12 km"></div>
             <figcaption>Ugens program</figcaption>
@@ -1013,6 +1185,17 @@
         <span class="section-label">Kontakt</span>
         <h2 class="section-headline">Lad os<br>tage en snak.</h2>
         <p class="lead">Ingen forpligtelse. Ingen salgspitch.</p>
+        <!-- Kontaktvej (etape 3, 05.10): virker i Instagrams/Facebooks indbyggede browser og uden mailprogram — Ring og SMS er almindelige
+             tel:/sms:-links, Instagram-beskeden et almindeligt link. Intet script. Nummeret står også i JSON-LD og handelsbetingelserne (tjek 6). -->
+        <div class="kontakt-hurtig">
+          <div class="kontakt-knapper">
+            <a href="tel:+4529898704" class="btn-primary" aria-label="Ring til Rune">Ring</a>
+            <a href="sms:+4529898704" class="btn-primary" aria-label="Send SMS til Rune">SMS</a>
+          </div>
+          <p class="kontakt-nummer">29 89 87 04</p>
+          <p class="kontakt-svar">Jeg svarer senest næste hverdag.</p>
+          <a href="https://ig.me/m/radichcoaching" class="kontakt-ig">Skriv på Instagram <span aria-hidden="true">→</span></a>
+        </div>
         <ol class="kontakt-trin" aria-label="Sådan foregår det">
           <li><strong>Du skriver</strong><span>Fortæl lidt om hvor du er, og hvad du vil.</span></li>
           <li><strong>Vi tager en snak</strong><span>Uforpligtende. Vi finder ud af, hvad du har brug for, og hvad dit forløb skal indeholde.</span></li>
@@ -1021,21 +1204,23 @@
         <p class="kontakt-sted">Fysisk træning i Lemvig og omegn. Coaching efter aftale.</p>
 
         <div class="kontakt-channels">
-          <a href="mailto:rune@radichcoaching.dk" class="kontakt-channel">
+          <!-- Mailadressen som TEKST, man kan markere og kopiere (etape 3): rækken er ikke selv et link, for et mailto-link gør intet i en indbygget
+               browser uden mailprogram. "Åbn din mail-app" er et almindeligt mailto-link ved siden af. -->
+          <div class="kontakt-channel kontakt-channel-mail">
             <div class="kontakt-channel-icon"></div>
             <div class="kontakt-channel-text">
               <span class="kontakt-channel-label">Email</span>
-              <span class="kontakt-channel-value">rune@radichcoaching.dk</span>
+              <span class="kontakt-channel-value kontakt-mailtekst">rune@radichcoaching.dk</span>
+              <span class="kontakt-kopi">Markér og kopiér adressen — eller <a href="mailto:rune@radichcoaching.dk">åbn din mail-app <span aria-hidden="true">→</span></a></span>
             </div>
-            <span class="kontakt-channel-arrow">→</span>
-          </a>
+          </div>
           <a href="https://www.instagram.com/radichcoaching/" target="_blank" rel="noopener" class="kontakt-channel">
             <div class="kontakt-channel-icon"></div>
             <div class="kontakt-channel-text">
               <span class="kontakt-channel-label">Instagram</span>
               <span class="kontakt-channel-value">@radichcoaching</span>
             </div>
-            <span class="kontakt-channel-arrow">→</span>
+            <span class="kontakt-channel-arrow" aria-hidden="true">→</span>
           </a>
           <a href="https://www.facebook.com/profile.php?id=61579005419885" target="_blank" rel="noopener" class="kontakt-channel">
             <div class="kontakt-channel-icon"></div>
@@ -1043,7 +1228,7 @@
               <span class="kontakt-channel-label">Facebook</span>
               <span class="kontakt-channel-value">Radich Coaching</span>
             </div>
-            <span class="kontakt-channel-arrow">→</span>
+            <span class="kontakt-channel-arrow" aria-hidden="true">→</span>
           </a>
         </div>
       </div>
@@ -1063,9 +1248,9 @@
              ekstern konto nødvendigt, virker med det samme. Skriv til mig
              hvis en "afsendes stille i baggrunden"-oplevelse ønskes i
              stedet — det kræver en af de nævnte tjenester. -->
-        <form id="kontakt-form">
+        <form id="kontakt-form" aria-labelledby="kontakt-form-title">
           <h3 id="kontakt-form-title">Skriv til mig</h3>
-          <p class="sub" id="kontakt-form-sub">Jeg svarer inden for 24 timer.</p>
+          <p class="sub" id="kontakt-form-sub">Jeg svarer senest næste hverdag.</p>
           <div class="form-group">
             <label for="navn">Navn</label>
             <input type="text" id="navn" name="navn" placeholder="Dit navn" autocomplete="name" required>
@@ -1092,7 +1277,7 @@
   </main>
 
   <footer>
-    <a href="#hero" class="footer-logo">RC.</a>
+    <a href="#hero" class="footer-logo" aria-label="RC – Radich Coaching, til toppen">RC.</a>
     <span class="footer-legal-links">
       <a href="handelsbetingelser.html">Handelsbetingelser</a>
       <a href="privatlivspolitik.html">Privatlivspolitik</a>
@@ -1100,6 +1285,9 @@
     <span class="footer-text">© <span id="aar">2026</span> Radich Coaching · CVR 45834786 · Lemvig-området</span>
   </footer>
 
+  <!-- Hvert script står i sit EGET script-element (værn mod fejl, 05.10): kaster ét af dem en fejl, stopper kun det ene — de andre
+       kører videre. Før lå alle syv i ét script, og en fejl i menuen slog også nedtælling, kontaktknapper og formular ihjel.
+       Ændres et script (selv ét tegn): node tests/tjek.js --ret-csp (hvert script har sit eget fingeraftryk i sikkerhedsreglen). -->
   <script>
     // Mobilmenuen (Rune: "Ingen mobilnavigation" → hamburger). Trin 5 (29.09): glider ind over et mørkt lag, lukker ved tryk på
     // laget, på et menupunkt og på Escape, og siden bagved står stille, mens den er åben. Klikkene sættes her — ikke med onclick
@@ -1144,7 +1332,8 @@
         if (bred.addEventListener) bred.addEventListener('change', vedSkift); else if (bred.addListener) bred.addListener(vedSkift);
       }
     })();
-
+  </script>
+  <script>
     // Nav bliver til en mørk, blurret bjælke når man har scrollet forbi
     // hero-gradienten (i stedet for kun den falmende gradient i toppen).
     (function () {
@@ -1156,27 +1345,39 @@
       window.addEventListener('scroll', onScroll, { passive: true });
       onScroll();
     })();
-
+  </script>
+  <script>
     // Scroll-reveal: sektionerne fader/løfter ind, når de kommer i billedet — samme følelse som hero's indlæsning.
     // Trin 5 (29.09): elementerne skjules først HER (klassen reveal-klar på <html>). Uden JavaScript, uden
     // IntersectionObserver, med "Reducér bevægelse" slået til — eller hvis scriptet fejler — står alt bare synligt.
     // Starter lidt tidligere end før (så snart kanten er 8 % inde), så man ikke ruller gennem en tom skærm.
+    // Værn (05.10): reveal-klar sættes SIDST, når alt er sat op — og går noget galt, tages den af igen (også hvis en fejl kommer senere),
+    // så siden aldrig kan stå tom, fordi observeren holdt op med at virke.
     (function () {
       var revealEls = document.querySelectorAll('.reveal');
       if (!('IntersectionObserver' in window)) return;
       if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      document.documentElement.classList.add('reveal-klar');
-      var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (entry) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            io.unobserve(entry.target);
-          }
-        });
-      }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
-      revealEls.forEach(function (el) { io.observe(el); });
+      var io;
+      try {
+        io = new IntersectionObserver(function (entries) {
+          try {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                io.unobserve(entry.target);
+              }
+            });
+          } catch (e) { document.documentElement.classList.remove('reveal-klar'); }
+        }, { threshold: 0, rootMargin: '0px 0px -8% 0px' });
+        revealEls.forEach(function (el) { io.observe(el); });
+        document.documentElement.classList.add('reveal-klar');
+      } catch (e) {
+        document.documentElement.classList.remove('reveal-klar');
+        try { if (io) io.disconnect(); } catch (e2) {}
+      }
     })();
-
+  </script>
+  <script>
     // Nedtælling til Strong Viking Frankfurt (trin 6, 29.09): hele dage efter dansk kalender; efter løbet står kun datoen.
     (function () {
       var el = document.getElementById('vej-dage'), txt = document.getElementById('vej-tekst');
@@ -1188,24 +1389,28 @@
       else if (dage === 1) { el.textContent = '1'; txt.textContent = 'dag til start i Frankfurt'; }
       else if (dage === 0) { el.textContent = 'I dag'; txt.textContent = 'Strong Viking Frankfurt'; }
     })();
-
+  </script>
+  <script>
     // Årstallet i bunden følger med kalenderen (drift, 30.09) — ingen, der skal huske at rette det 1. januar.
     // Uden JavaScript står 2026 (året siden gik i luften).
     (function () { var e = document.getElementById('aar'); if (e) e.textContent = new Date().getFullYear(); })();
-
-    // "Skriv til mig" (trin 2, 29.09 — "one touch"): på en telefon åbner knapperne mailen direkte med emnet udfyldt (1 tryk i
-    // stedet for rul + 3 felter + send). På en computer — og uden JavaScript — fører de stadig ned til Kontakt (formularen og
-    // mailadressen), fordi et mail-link intet gør på en computer uden mailprogram. Ingen data forlader telefonen.
+  </script>
+  <!-- Mailto-omskrivningen af "Skriv til mig" er FJERNET (etape 3, 05.10): knapperne fører til #kontakt på ALLE enheder, hvor Ring, SMS, Instagram og
+       mailadressen står. Før åbnede de en mail på en telefon — og et mailto-link kan gøre ingenting i en indbygget browser uden mailprogram. -->
+  <script>
+    // Tilgængelighed (05.10): rækken af app-skærme kan kun rulles under 769 px (swipe) — der er tabindex="0" et rigtigt tab-stop. På computer er der
+    // intet at rulle, og tab-stoppet fører ingen steder hen, så det tages af dér (og sættes igen, hvis vinduet gøres smalt). Uden JavaScript
+    // står tabindex="0" i HTML'en, som før.
     (function () {
-      if (!window.matchMedia || !window.matchMedia('(hover: none) and (pointer: coarse)').matches) return;
-      var mail = 'mailto:rune@radichcoaching.dk'
-        + '?subject=' + encodeURIComponent('Lad os tage en snak')
-        + '&body=' + encodeURIComponent('Hej Rune\n\nKort om mig, og hvad jeg gerne vil:\n\n');
-      Array.prototype.forEach.call(document.querySelectorAll('a.btn-primary[href="#kontakt"]'), function (a) {
-        a.setAttribute('href', mail);
-      });
+      var rul = document.querySelector('.appen-skaerme');
+      if (!rul || !window.matchMedia) return;
+      var smal = window.matchMedia('(max-width: 768px)');
+      var saet = function () { if (smal.matches) rul.setAttribute('tabindex', '0'); else rul.removeAttribute('tabindex'); };
+      saet();
+      if (smal.addEventListener) smal.addEventListener('change', saet); else if (smal.addListener) smal.addListener(saet);
     })();
-
+  </script>
+  <script>
     // Kontakt-formular — siden er 100% statisk (GitHub Pages), så der er
     // ingen server at sende POST-data til. Bygger i stedet en mailto:-
     // besked af felterne og åbner besøgendes eget mail-program med den
